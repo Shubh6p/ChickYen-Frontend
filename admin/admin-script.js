@@ -1,7 +1,7 @@
 // ==============================
 // CONFIG & STATE
 // ==============================
-const API_URL = "https://chickyen-backend.onrender.com/";
+const API_URL = "https://chickyen-backend.onrender.com/api/";
 const token = localStorage.getItem("token");
 const user = JSON.parse(localStorage.getItem("user"));
 let editingProductId = null;
