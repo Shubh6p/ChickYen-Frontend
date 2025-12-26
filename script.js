@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://chickyen-backend.onrender.com/api";
 
 async function loadProducts() {
   const container = document.getElementById("productsContainer");
