@@ -1,4 +1,4 @@
-const API_BASE = "https://chickyen-backend.onrender.com/api/customers";
+const API_BASE = "https://chickyen-backend.onrender.com/apicustomers";
 
 // =====================
 // LOGIN LOGIC
