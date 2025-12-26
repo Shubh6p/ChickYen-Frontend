@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Yen Achar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FFF8F0; }
+        .glass-card { background-color: rgba(255, 248, 240, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(234, 88, 12, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<nav class="glass-card sticky top-0 z-50">
+    <div class="flex justify-between items-center px-6 md:px-10 py-5 max-w-7xl mx-auto w-full">
+        <div class="text-xl sm:text-2xl font-extrabold text-orange-600 flex items-center tracking-tight">
+            Chicken Pickle <span class="mx-3 h-6 w-[1px] bg-orange-200 inline-block"></span> 
+            <span class="text-gray-800 font-bold">Yen Achar</span>
+        </div>
+        <div class="hidden md:flex space-x-10 font-bold text-gray-700">
+            <a href="index.html" class="hover:text-orange-600">Home</a>
+            <a href="menu.html" class="hover:text-orange-600">Menu</a>
+            <a href="aboutus.html" class="hover:text-orange-600">About Us</a>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-6xl mx-auto px-6 py-10 flex-grow w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div class="glass-card p-8 rounded-[2.5rem] shadow-xl space-y-8">
+            <div>
+                <h2 class="text-2xl font-black mb-6 text-gray-800 flex items-center gap-2">👤 Personal Details</h2>
+                <div class="space-y-4">
+                    <input type="text" id="custName" placeholder="Full Name" class="w-full bg-white/50 border border-orange-100 px-5 py-4 rounded-2xl outline-none focus:ring-2 focus:ring-orange-600">
+                    <input type="email" id="custEmail" placeholder="Email Address" class="w-full bg-white/50 border border-orange-100 px-5 py-4 rounded-2xl outline-none focus:ring-2 focus:ring-orange-600">
+                    <input type="text" id="custPhone" placeholder="Phone Number" class="w-full bg-white/50 border border-orange-100 px-5 py-4 rounded-2xl outline-none focus:ring-2 focus:ring-orange-600">
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-black mb-6 text-gray-800 flex items-center gap-2">📍 Select Pickup Point</h2>
+                <div id="pickup-options-container" class="space-y-3 max-h-64 overflow-y-auto pr-2">
+                    <div class="animate-pulse text-gray-400 text-sm italic">Loading pickup points...</div>
+                </div>
+                <input type="hidden" id="selectedPickupPoint">
+                <input type="hidden" id="selectedPickupAddress">
+            </div>
+        </div>
+
+        <div class="glass-card p-8 rounded-[2.5rem] shadow-xl">
+            <h2 class="text-2xl font-black mb-6 text-gray-800">💳 Payment</h2>
+            <div class="space-y-3 mb-8">
+                <label class="flex items-center p-4 bg-white/50 rounded-2xl cursor-pointer border-2 border-transparent hover:border-orange-600 transition">
+                    <input type="radio" name="payment" value="upi" class="w-5 h-5 accent-orange-600" checked>
+                    <span class="ml-3 font-bold text-gray-700 uppercase text-xs tracking-widest">UPI (GPay / PhonePe)</span>
+                </label>
+                <label class="flex items-center p-4 bg-white/50 rounded-2xl cursor-pointer border-2 border-transparent hover:border-orange-600 transition">
+                    <input type="radio" name="payment" value="cod" class="w-5 h-5 accent-orange-600">
+                    <span class="ml-3 font-bold text-gray-700 uppercase text-xs tracking-widest">Cash on Delivery</span>
+                </label>
+            </div>
+
+            <div class="border-t border-orange-100 pt-6">
+                <h3 class="font-black text-gray-800 mb-4 uppercase text-xs tracking-widest text-gray-400">Order Summary</h3>
+                <ul id="orderSummary" class="text-sm text-gray-600 mb-6 space-y-3 font-medium"></ul>
+                <div class="flex justify-between items-center bg-orange-600 p-5 rounded-2xl text-white shadow-lg">
+                    <span class="font-bold text-sm uppercase">Total</span>
+                    <span id="totalAmount" class="text-2xl font-black">₹0</span>
+                </div>
+                <button type="button" onclick="placeOrder()" class="w-full mt-6 bg-gray-900 hover:bg-black text-white font-black py-4 rounded-2xl transition-all shadow-xl active:scale-95 uppercase tracking-widest text-sm">
+                    Confirm Order
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="orderSuccessModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm hidden px-4">
+    <div class="bg-[#FFF8F0] w-full max-w-md p-8 rounded-[3rem] shadow-2xl text-center border-4 border-white">
+        <div class="text-4xl mb-4">🎉</div>
+        <h2 class="text-3xl font-black text-gray-900 mb-2">Order Placed!</h2>
+        <div class="text-left text-xs bg-white/80 p-5 rounded-3xl border border-orange-100 space-y-2 mb-6">
+            <p><strong>Order ID:</strong> <span id="modalOrderId" class="text-orange-600"></span></p>
+            <p><strong>Customer:</strong> <span id="modalCustomerName"></span></p>
+            <p><strong>Pickup At:</strong> <span id="modalCustomerAddress" class="text-gray-500"></span></p>
+            <div class="pt-2 border-t border-orange-50 mt-2">
+                <p class="font-bold uppercase text-[10px] text-gray-400">Items:</p>
+                <ul id="modalOrderItems" class="mt-1 font-bold text-gray-700 list-disc ml-4"></ul>
+            </div>
+        </div>
+        <button onclick="window.location.href='index.html'" class="w-full bg-orange-600 text-white font-black py-4 rounded-2xl hover:bg-black transition">
+            Back to Home
+        </button>
+    </div>
+</div>
+
+<script>
+    const API_BASE = "http://localhost:5000/api";
+
+    window.onload = async () => {
+        const token = localStorage.getItem('customerToken');
+        if (!token) {
+            alert("Please login to proceed.");
+            window.location.href = "login.html";
+            return;
+        }
+
+        // 1. Fetch Customer Info
+        try {
+            const res = await fetch(`${API_BASE}/customers/details`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const customer = await res.json();
+                document.getElementById('custName').value = customer.name || "";
+                document.getElementById('custEmail').value = customer.email || "";
+                document.getElementById('custPhone').value = customer.phone || "";
+            }
+        } catch (err) { console.error("Customer fetch error:", err); }
+
+        // 2. Initialize UI
+        renderPaymentPageCart();
+        loadPickupPoints();
+    };
+
+    function renderPaymentPageCart() {
+        const cart = JSON.parse(localStorage.getItem("cartItems")) || [];
+        const container = document.getElementById("orderSummary");
+        let total = 0;
+        container.innerHTML = cart.map(item => {
+            total += item.price * item.quantity;
+            return `<li class="flex justify-between"><span>${item.name} (x${item.quantity})</span> <span>₹${item.price * item.quantity}</span></li>`;
+        }).join('');
+        document.getElementById("totalAmount").textContent = `₹${total}`;
+    }
+
+    async function loadPickupPoints() {
+        const container = document.getElementById('pickup-options-container');
+        try {
+            const res = await fetch(`${API_BASE}/locations/pickup-points`);
+            const locations = await res.json();
+            if (!locations.length) {
+                container.innerHTML = `<p class="text-gray-400 text-xs italic">No pickup points available.</p>`;
+                return;
+            }
+            container.innerHTML = locations.map(loc => `
+                <label class="flex items-start p-4 bg-white/50 rounded-2xl cursor-pointer border-2 border-transparent hover:border-orange-200 transition relative">
+                    <input type="radio" name="pickupLoc" onclick="setPickup('${loc.name}', '${loc.address}')" class="mt-1 w-5 h-5 accent-orange-600">
+                    <div class="ml-4">
+                        <p class="font-black text-gray-800 text-sm uppercase">${loc.name}</p>
+                        <p class="text-[10px] text-gray-500 mt-1">${loc.address}</p>
+                        <a href="${loc.googleMapsLink}" target="_blank" class="text-[10px] font-bold text-blue-600 hover:underline">📍 Map Link</a>
+                    </div>
+                </label>
+            `).join('');
+        } catch (err) { container.innerHTML = `<p class="text-red-500 text-xs">Error loading locations.</p>`; }
+    }
+
+    function setPickup(name, addr) {
+        document.getElementById('selectedPickupPoint').value = name;
+        document.getElementById('selectedPickupAddress').value = addr;
+    }
+
+    async function placeOrder() {
+        const cart = JSON.parse(localStorage.getItem("cartItems")) || [];
+        const customerUser = JSON.parse(localStorage.getItem("customerUser"));
+        const pickupName = document.getElementById('selectedPickupPoint').value;
+        const pickupAddr = document.getElementById('selectedPickupAddress').value;
+
+        if (!cart.length) return alert("Cart is empty!");
+        if (!customerUser?._id) return alert("Please log in again.");
+        if (!pickupName) return alert("Please select a pickup point!");
+
+        const orderData = {
+            customerId: customerUser._id,
+            customerName: document.getElementById('custName').value,
+            email: document.getElementById('custEmail').value,
+            phone: document.getElementById('custPhone').value,
+            pickupLocation: { locationName: pickupName, fullAddress: pickupAddr },
+            items: cart.map(i => ({ productId: i.id || i._id, name: i.name, price: i.price, weight: i.weight, quantity: i.quantity, image: i.image })),
+            totalAmount: cart.reduce((sum, i) => sum + (i.price * i.quantity), 0)
+        };
+
+        try {
+            const res = await fetch(`${API_BASE}/orders/place`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(orderData)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                document.getElementById('modalOrderId').textContent = `#${data.orderId}`;
+                document.getElementById('modalCustomerName').textContent = orderData.customerName;
+                document.getElementById('modalCustomerAddress').textContent = pickupAddr;
+                document.getElementById('modalOrderItems').innerHTML = cart.map(i => `<li>${i.name} (x${i.quantity})</li>`).join('');
+                document.getElementById('orderSuccessModal').classList.remove('hidden');
+                localStorage.removeItem("cartItems");
+            } else { alert("Error: " + data.error); }
+        } catch (err) { alert("Server error connection."); }
+    }
+</script>
+</body>
+</html>

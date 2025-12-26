@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Yen Achar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .admin-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(234, 88, 12, 0.1); }
+        .sidebar-active { background-color: #ea580c !important; color: white !important; box-shadow: 0 10px 15px -3px rgba(234, 88, 12, 0.2); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #fed7aa; border-radius: 10px; }
+        /* Prevent layout shift when switching between grid and table-like views */
+        #admin-table-body { min-height: 400px; }
+    </style>
+</head>
+<body class="bg-[#FFF8F0] min-h-screen flex overflow-hidden">
+
+    <aside class="w-64 bg-white border-r border-orange-100 hidden md:flex flex-col p-6 h-screen sticky top-0">
+        <div class="text-xl font-extrabold text-orange-600 mb-10 px-2 tracking-tight">
+            Admin <span class="text-gray-800">Panel</span>
+        </div>
+        
+        <nav class="space-y-2 flex-grow">
+            <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center space-x-3 p-4 rounded-2xl font-bold text-gray-600 hover:bg-orange-50 transition sidebar-active">
+                <span>📦</span> <span>Orders</span>
+            </button>
+            <button onclick="switchTab('sales')" id="tab-sales" class="w-full flex items-center space-x-3 p-4 rounded-2xl font-bold text-gray-600 hover:bg-orange-50 transition">
+                <span>📈</span> <span>Sales Data</span>
+            </button>
+            <button onclick="switchTab('products')" id="tab-products" class="w-full flex items-center space-x-3 p-4 rounded-2xl font-bold text-gray-600 hover:bg-orange-50 transition">
+                <span>🍗</span> <span>Products</span>
+            </button>
+            <button onclick="switchTab('customers')" id="tab-customers" class="w-full flex items-center space-x-3 p-4 rounded-2xl font-bold text-gray-600 hover:bg-orange-50 transition">
+                <span>👤</span> <span>Customers</span>
+            </button>
+            <button onclick="switchTab('locations')" id="tab-locations" class="w-full flex items-center space-x-3 p-4 rounded-2xl font-bold text-gray-600 hover:bg-orange-50 transition">
+                <span>📍</span> <span>Pickup Points</span>
+            </button>
+            <button onclick="switchTab('users')" id="tab-users" class="w-full flex items-center space-x-3 p-4 rounded-2xl font-bold text-gray-600 hover:bg-orange-50 transition">
+                <span>👥</span> <span>Staff/Admins</span>
+            </button>
+            <button onclick="switchTab('logs')" id="tab-logs" class="w-full flex items-center space-x-3 p-4 rounded-2xl font-bold text-gray-600 hover:bg-orange-50 transition">
+                <span>📜</span> <span>Activity Logs</span>
+            </button>
+        </nav>
+
+        <div class="pt-6 border-t border-gray-100 space-y-4">
+            <button id="sidebar-add-btn" onclick="toggleProductModal()" class="w-full bg-orange-600 text-white px-4 py-3 rounded-2xl font-bold hover:bg-black transition shadow-lg hidden">
+                + New Product
+            </button>
+            <button onclick="logout()" class="w-full text-left p-4 text-red-500 font-bold text-sm hover:bg-red-50 rounded-xl transition">
+                Logout 👋
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-grow p-6 md:p-12 overflow-y-auto custom-scrollbar h-screen">
+        
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+            <div>
+                <h1 id="view-title" class="text-3xl font-black text-gray-900 leading-tight">Dashboard</h1>
+                <p id="view-desc" class="text-gray-500 font-medium italic">Welcome to the control center.</p>
+            </div>
+            
+            <div id="search-container" class="relative w-full max-w-md">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">🔍</span>
+                <input type="text" id="orderSearchInput" onkeyup="handleSearch()" placeholder="Search data..." 
+                    class="w-full bg-white border border-orange-100 pl-12 pr-6 py-4 rounded-2xl shadow-sm focus:ring-2 focus:ring-orange-600 outline-none transition-all text-sm font-medium">
+            </div>
+        </header>
+
+        <div id="stats-container" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 hidden">
+            <div class="admin-card p-6 rounded-[2.5rem]">
+                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Today's Revenue</p>
+                <h2 id="stat-revenue" class="text-3xl font-black text-orange-600 mt-1">₹0</h2>
+            </div>
+            <div class="admin-card p-6 rounded-[2.5rem] relative">
+                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Pending</p>
+                <h2 id="stat-pending" class="text-3xl font-black text-yellow-500 mt-1">0</h2>
+                <div id="pending-status-dots" class="flex flex-wrap gap-1 mt-3"></div>
+            </div>
+            <div class="admin-card p-6 rounded-[2.5rem]">
+                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Completed</p>
+                <h2 id="stat-completed" class="text-3xl font-black text-green-500 mt-1">0</h2>
+            </div>
+            <div class="admin-card p-6 rounded-[2.5rem]">
+                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Total Sales</p>
+                <h2 id="stat-total" class="text-3xl font-black text-gray-800 mt-1">0</h2>
+            </div>
+        </div>
+
+        <div id="filter-controls" class="flex flex-wrap gap-2 mb-8 hidden">
+            <button onclick="fetchOrders('all')" class="px-5 py-2.5 bg-gray-900 text-white rounded-xl text-xs font-black uppercase tracking-widest transition shadow-md">All Orders</button>
+            <button onclick="fetchOrders('Processing')" class="px-5 py-2.5 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 rounded-xl text-xs font-black uppercase tracking-widest transition">Processing</button>
+            <button onclick="fetchOrders('Verified')" class="px-5 py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl text-xs font-black uppercase tracking-widest transition">Verified</button>
+            <button onclick="fetchOrders('Packed')" class="px-5 py-2.5 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-xl text-xs font-black uppercase tracking-widest transition">Packed</button>
+            <button onclick="fetchOrders('Out for Delivery')" class="px-5 py-2.5 bg-orange-50 text-orange-600 hover:bg-orange-100 rounded-xl text-xs font-black uppercase tracking-widest transition">Out for Delivery</button>
+        </div>
+
+        <div id="main-view-wrapper" class="pb-20">
+            <div id="admin-table-body" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+        </div>
+            
+            <div id="table-head-container" class="hidden">
+                 <table class="w-full text-left">
+                    <thead class="bg-gray-50/50 border-b border-orange-50">
+                        <tr id="table-head-row" class="text-gray-400 text-[10px] uppercase font-black tracking-[0.2em]"></tr>
+                    </thead>
+                 </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="actionConfirmModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md hidden px-4">
+        <div class="bg-white w-full max-w-sm p-8 rounded-[3rem] shadow-2xl text-center border-b-8 border-orange-600">
+            <div id="actionIcon" class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl bg-orange-50"></div>
+            <h3 id="actionTitle" class="text-2xl font-black text-gray-900 mb-2">Confirm Action</h3>
+            <p id="actionMessage" class="text-gray-400 text-sm mb-8 leading-relaxed"></p>
+            <div class="flex gap-3">
+                <button onclick="closeActionModal()" class="flex-1 bg-gray-100 text-gray-500 font-bold py-4 rounded-2xl hover:bg-gray-200 transition uppercase text-[10px] tracking-widest">Back</button>
+                <button id="confirmBtn" class="flex-1 text-white font-black py-4 rounded-2xl shadow-lg transition uppercase text-[10px] tracking-widest">Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="productModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md hidden px-4">
+        <div class="bg-white w-full max-w-lg p-10 rounded-[3rem] shadow-2xl border-t-8 border-orange-600 overflow-y-auto max-h-[90vh] custom-scrollbar">
+            <h2 class="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
+                <span class="p-2 bg-orange-100 rounded-xl text-lg">🍗</span> New <span class="text-orange-600">Product</span>
+            </h2>
+            <form id="productForm" class="space-y-5">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Product Title</label>
+                    <input type="text" id="pName" placeholder="e.g. Chicken Pickle" class="w-full bg-orange-50/30 border border-orange-100 px-5 py-4 rounded-2xl focus:ring-2 focus:ring-orange-600 transition outline-none font-bold" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" id="pPrice" placeholder="Price (₹)" class="bg-orange-50/30 border border-orange-100 px-5 py-4 rounded-2xl font-bold outline-none" required>
+                    <input type="text" id="pWeight" placeholder="Weight (e.g. 200g)" class="bg-orange-50/30 border border-orange-100 px-5 py-4 rounded-2xl font-bold outline-none" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <select id="pSpice" class="bg-orange-50/30 border border-orange-100 px-5 py-4 rounded-2xl font-bold outline-none">
+                        <option value="1">🌶️ Mild</option>
+                        <option value="3">🌶️🌶️🌶️ Hot</option>
+                        <option value="5">🌶️🌶️🌶️🌶️🌶️ U-Morok</option>
+                    </select>
+                    <input type="number" id="pStock" placeholder="Initial Stock" class="bg-orange-50/30 border border-orange-100 px-5 py-4 rounded-2xl font-bold outline-none" required>
+                </div>
+
+                <textarea id="pDesc" rows="3" placeholder="Marketing Description..." class="w-full bg-orange-50/30 border border-orange-100 px-5 py-4 rounded-2xl outline-none font-medium text-gray-600" required></textarea>
+                <input type="text" id="pImage" placeholder="Image URL (e.g. https://...)" class="w-full bg-orange-50/30 border border-orange-100 px-5 py-4 rounded-2xl outline-none font-medium" required>
+
+                <div class="flex gap-3 pt-6">
+                    <button type="button" onclick="toggleProductModal()" class="flex-1 bg-gray-100 text-gray-500 font-black py-4 rounded-2xl transition uppercase text-xs tracking-widest">Cancel</button>
+                    <button type="submit" class="flex-[2] bg-orange-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-black transition uppercase text-xs tracking-widest">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="locationModal" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-md hidden px-4">
+        <div class="bg-white w-full max-w-md p-10 rounded-[3rem] shadow-2xl border-t-8 border-orange-600">
+            <h2 class="text-2xl font-black mb-8 italic">New <span class="text-orange-600">Pickup Point</span></h2>
+            <form onsubmit="handleLocationSubmit(event)" class="space-y-4">
+                <input type="text" id="locName" placeholder="Branch Name (e.g. Imphal Main)" class="w-full bg-orange-50/30 border border-orange-100 px-5 py-4 rounded-2xl font-bold outline-none" required>
+                <textarea id="locAddress" placeholder="Full Detailed Address..." class="w-full bg-orange-50/30 border border-orange-100 px-5 py-4 rounded-2xl font-medium outline-none" required></textarea>
+                <input type="url" id="locMaps" placeholder="Google Maps URL" class="w-full bg-orange-50/30 border border-orange-100 px-5 py-4 rounded-2xl font-medium outline-none" required>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="toggleLocationModal()" class="flex-1 bg-gray-100 text-gray-500 font-black py-4 rounded-2xl uppercase text-xs tracking-widest">Cancel</button>
+                    <button type="submit" class="flex-[2] bg-orange-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-black transition uppercase text-xs tracking-widest">Save Point</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="staffModal" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-md hidden px-4">
+    <div class="bg-white w-full max-w-md p-10 rounded-[3rem] shadow-2xl border-t-8 border-gray-900">
+        <h2 class="text-2xl font-black mb-8 italic">Manage <span class="text-orange-600">Staff</span></h2>
+        
+        <form onsubmit="handleStaffSubmit(event)" class="space-y-4">
+            <div class="space-y-1">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
+                <input type="text" id="staffName" placeholder="John Doe" class="w-full bg-gray-50 border border-gray-100 px-5 py-4 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-orange-600 transition" required>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Official Email</label>
+                <input type="email" id="staffEmail" placeholder="admin@yenachar.com" class="w-full bg-gray-50 border border-gray-100 px-5 py-4 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-orange-600 transition" required>
+            </div>
+
+            <div id="staffPassContainer" class="space-y-1">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Temporary Password</label>
+                <input type="password" id="staffPass" placeholder="••••••••" class="w-full bg-gray-50 border border-gray-100 px-5 py-4 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-orange-600 transition">
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Access Level</label>
+                <select id="staffRole" class="w-full bg-gray-50 border border-gray-100 px-5 py-4 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-orange-600 transition">
+                    <option value="admin">Admin (Standard Dashboard Access)</option>
+                    <option value="owner">Owner (Full Access + Manage Admins)</option>
+                </select>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="toggleStaffModal()" class="flex-1 bg-gray-100 text-gray-500 font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest hover:bg-gray-200 transition">
+                    Cancel
+                </button>
+                <button type="submit" class="flex-[2] bg-gray-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-orange-600 transition uppercase text-[10px] tracking-widest">
+                    Save Account
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    
+
+    <script src="admin-script.js"></script>
+</body>
+</html>

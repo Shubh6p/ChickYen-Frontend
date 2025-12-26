@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track My Orders | Yen Achar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .nav-custom {
+            background-color: rgba(255, 248, 240, 0.85); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(234, 88, 12, 0.1);
+        }
+        .order-card { background: #ffffff; border: 1px solid rgba(234, 88, 12, 0.1); }
+        
+        /* Progress Bar Animation */
+        .step-line { position: absolute; top: 12px; left: 0; right: 0; height: 2px; background: #f3f4f6; z-index: 0; }
+        .step-progress { position: absolute; top: 12px; left: 0; height: 2px; background: #ea580c; z-index: 1; transition: width 1s ease-in-out; }
+        .step-node { position: relative; z-index: 2; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; background: #f3f4f6; }
+        .step-node.active { background: #ea580c; box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.2); }
+    </style>
+</head>
+<body class="bg-[#FFF8F0] min-h-screen">
+
+    <nav class="nav-custom sticky top-0 z-50">
+        <div class="flex justify-between items-center px-6 md:px-10 py-5 max-w-7xl mx-auto w-full">
+            <div class="text-xl sm:text-2xl font-extrabold text-orange-600 flex items-center tracking-tight">
+                Chicken Pickle 
+                <span class="mx-3 h-6 w-[1px] bg-orange-200 inline-block"></span> 
+                <span class="text-gray-800 font-bold">Yen Achar</span>
+            </div>
+            <div class="hidden md:flex space-x-10 font-bold text-gray-700 items-center">
+                <a href="index.html" class="hover:text-orange-600 transition">Home</a>
+                <a href="menu.html" class="hover:text-orange-600 transition">Menu</a>
+                <a href="profile.html" class="hover:text-orange-600 transition">My Profile</a>
+                <button onclick="handleLogout()" class="bg-gray-900 text-white px-6 py-2 rounded-full hover:bg-orange-600 transition shadow-lg">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="p-4 md:p-10">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+                <div>
+                    <a href="index.html" class="text-orange-600 font-bold text-sm mb-2 block hover:underline">← Continue Shopping</a>
+                    <h1 class="text-4xl font-black text-gray-900">Order <span class="text-orange-600">History</span></h1>
+                </div>
+                <div class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-orange-50">
+                    <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Active Token Session</p>
+                    <p class="text-sm font-bold text-green-600">Securely Logged In</p>
+                </div>
+            </div>
+            
+            <div id="userOrdersList" class="space-y-8">
+                </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "http://localhost:5000/api";
+        const token = localStorage.getItem("customerToken");
+
+        if (!token) window.location.href = "login.html";
+
+        function logout() {
+            localStorage.removeItem("customerToken");
+            localStorage.removeItem("customerUser");
+            window.location.href = "login.html";
+        }
+
+        const statusSteps = ["Processing", "Verified", "Packed", "Out for Delivery", "Delivered"];
+
+        async function loadMyOrders() {
+            try {
+                const res = await fetch(`${API_URL}/orders/user-history`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                
+                const data = await res.json();
+                const list = document.getElementById("userOrdersList");
+
+                if (!res.ok || !Array.isArray(data)) {
+                    list.innerHTML = `<div class="bg-red-50 text-red-600 p-6 rounded-3xl font-bold">Error: ${data.error || "Could not load history"}</div>`;
+                    return;
+                }
+
+                if (data.length === 0) {
+                    list.innerHTML = `<div class="text-center py-20 bg-white rounded-[3rem] border border-dashed border-orange-200">
+                        <p class="text-gray-400 font-bold">No orders found in your account.</p>
+                        <a href="menu.html" class="mt-4 inline-block text-orange-600 font-black">Go to Menu →</a>
+                    </div>`;
+                    return;
+                }
+
+                list.innerHTML = data.map(o => {
+                    const statusIndex = statusSteps.indexOf(o.status);
+                    const progressWidth = `${(Math.max(0, statusIndex) / (statusSteps.length - 1)) * 100}%`;
+
+                    return `
+                    <div class="order-card p-6 md:p-10 rounded-[3rem] shadow-xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-[5rem] -z-10 opacity-50"></div>
+
+                        <div class="flex flex-col md:flex-row justify-between border-b border-gray-100 pb-6 mb-8 gap-4">
+                            <div>
+                                <span class="text-[10px] font-black bg-gray-900 text-white px-3 py-1 rounded-lg uppercase tracking-widest">Order #${o.orderId}</span>
+                                <p class="text-xs text-gray-400 font-bold mt-2 uppercase">Placed on ${new Date(o.createdAt).toLocaleDateString('en-IN', { dateStyle: 'long' })}</p>
+                            </div>
+                            <div class="md:text-right">
+                                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Grand Total</p>
+                                <p class="text-3xl font-black text-orange-600">₹${o.totalAmount}</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10">
+                            <div>
+                                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center">
+                                    <span class="mr-2">📍</span> Pickup Address
+                                </h4>
+                                <div class="bg-orange-50/50 p-5 rounded-2xl border border-orange-100">
+                                    <p class="font-bold text-gray-800">${o.customerName}</p>
+                                    <p class="text-sm text-gray-600 mt-1 leading-relaxed">${o.pickupLocation?.fullAddress || 'Address details unavailable'}</p>
+                                    <p class="text-xs font-bold text-gray-500 mt-3">📞 ${o.phone || 'N/A'}</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center">
+                                    <span class="mr-2">🛍️</span> Order Summary
+                                </h4>
+                                <ul class="space-y-3">
+                                    ${o.items.map(item => `
+                                        <li class="flex justify-between items-center text-sm">
+                                            <span class="font-bold text-gray-700">${item.name} <span class="text-gray-400 ml-1">x${item.quantity}</span></span>
+                                            <span class="font-black text-gray-900">${item.weight}</span>
+                                            <span class="font-black text-gray-900">₹${item.price * item.quantity}</span>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="relative py-10">
+                            <div class="step-line"></div>
+                            <div class="step-progress" style="width: ${progressWidth}"></div>
+                            <div class="flex justify-between relative">
+                                ${statusSteps.map((step, idx) => `
+                                    <div class="flex flex-col items-center">
+                                        <div class="step-node ${idx <= statusIndex ? 'active' : ''}">
+                                            ${idx <= statusIndex ? '✅' : ''}
+                                        </div>
+                                        <span class="text-[8px] md:text-[10px] font-black uppercase mt-3 ${idx <= statusIndex ? 'text-orange-600' : 'text-gray-300'} text-center">${step}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
+                            <p class="text-xs font-bold text-gray-500">Current Status: <span class="text-orange-600 font-black uppercase tracking-widest">${o.status}</span></p>
+                            
+                            <div class="flex gap-3 w-full md:w-auto">
+                                ${o.status === "Delivered" ? `
+                                    <button onclick="downloadUserInvoice('${o._id}')" class="flex-1 md:flex-none bg-green-600 hover:bg-green-700 text-white text-[10px] font-black uppercase px-8 py-4 rounded-2xl shadow-lg transition-all">
+                                        📄 Download Invoice
+                                    </button>
+                                ` : `
+                                    <button disabled class="flex-1 md:flex-none bg-gray-100 text-gray-400 text-[10px] font-black uppercase px-8 py-4 rounded-2xl cursor-not-allowed">
+                                        Invoice available after delivery
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }).join("");
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function downloadUserInvoice(orderId) {
+            const invoiceUrl = `${API_URL}/orders/invoice/${orderId}?token=${token}`;
+            window.open(invoiceUrl, '_blank');
+        }
+
+        window.onload = loadMyOrders;
+    </script>
+</body>
+</html>

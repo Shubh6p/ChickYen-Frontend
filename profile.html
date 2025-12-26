@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account | Yen Achar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #FFFBF7;
+            background-image: radial-gradient(#ea580c10 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .nav-custom {
+            background-color: rgba(255, 248, 240, 0.85); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(234, 88, 12, 0.1);
+        }
+
+        .profile-card {
+            background: #ffffff;
+            border: 1px solid rgba(234, 88, 12, 0.1);
+            box-shadow: 0 20px 40px -15px rgba(234, 88, 12, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-card:hover { transform: scale(1.01); }
+
+        .input-field {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1.5px solid #fed7aa;
+        }
+
+        .input-field:focus {
+            border-color: #ea580c;
+            box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.1);
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <nav class="nav-custom sticky top-0 z-50">
+        <div class="flex justify-between items-center px-6 md:px-10 py-5 max-w-7xl mx-auto w-full">
+            <div class="text-xl sm:text-2xl font-extrabold text-orange-600 flex items-center tracking-tight">
+                Chicken Pickle 
+                <span class="mx-3 h-6 w-[1px] bg-orange-200 inline-block"></span> 
+                <span class="text-gray-800 font-bold">Yen Achar</span>
+            </div>
+            <div class="hidden md:flex space-x-10 font-bold text-gray-700 items-center">
+                <a href="index.html" class="hover:text-orange-600 transition">Home</a>
+                <a href="menu.html" class="hover:text-orange-600 transition">Menu</a>
+                <a href="orders.html" class="hover:text-orange-600 transition">My Orders</a>
+                <button onclick="handleLogout()" class="bg-gray-900 text-white px-6 py-2 rounded-full hover:bg-orange-600 transition shadow-lg">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex items-center justify-center p-6 py-10">
+        <div class="profile-card w-full max-w-xl p-8 md:p-10 rounded-[2.5rem] relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-orange-50 rounded-bl-[4rem] -z-10"></div>
+            
+            <div class="flex items-center gap-6 mb-8">
+                <div id="avatarCircle" class="w-20 h-20 bg-orange-600 rounded-2xl rotate-3 flex items-center justify-center text-3xl font-black text-white shadow-xl shadow-orange-100">
+                    U
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black text-gray-900 leading-tight">
+                        <span id="greeting" class="text-orange-600 block text-sm uppercase tracking-widest">Hello!</span>
+                        <span id="displayNameHeader">Customer Profile</span>
+                    </h2>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mt-1">Personal Dashboard</p>
+                </div>
+            </div>
+
+            <form id="profileForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Your Full Name</label>
+                        <input type="text" id="profileName" class="input-field w-full bg-orange-50/30 px-5 py-3.5 rounded-2xl outline-none font-bold text-gray-800 text-sm" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
+                        <input type="text" id="profilePhone" class="input-field w-full bg-orange-50/30 px-5 py-3.5 rounded-2xl outline-none font-bold text-gray-800 text-sm" required>
+                    </div>
+                </div>
+
+                <div class="space-y-2 group opacity-70">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Login Email (Verified)</label>
+                    <input type="email" id="profileEmail" class="w-full bg-gray-100 border border-gray-200 px-5 py-3.5 rounded-2xl text-gray-400 font-medium text-sm cursor-not-allowed" readonly>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Main Delivery Address</label>
+                    <textarea id="profileAddress" rows="2" class="input-field w-full bg-orange-50/30 px-5 py-3.5 rounded-2xl outline-none resize-none font-medium text-gray-700 text-sm" required></textarea>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" id="saveBtn" class="flex-[2] bg-gray-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-orange-600 hover:-translate-y-1 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                        <span id="btnText">Update Account</span>
+                        <span id="loadingSpinner" class="hidden animate-spin">⌛</span>
+                    </button>
+                    <a href="index.html" class="flex-1 bg-white border-2 border-orange-100 text-orange-600 font-bold py-4 rounded-2xl text-center hover:bg-orange-50 transition text-xs uppercase tracking-widest flex items-center justify-center">
+                        Back
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <div id="successModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-md hidden px-4">
+        <div class="bg-white w-full max-w-xs p-10 rounded-[3rem] text-center border-b-8 border-orange-600 shadow-2xl scale-90 transition-transform">
+            <div class="text-6xl mb-4">🚀</div>
+            <h3 class="text-2xl font-black text-gray-900">Success!</h3>
+            <p class="text-gray-400 text-sm mt-2 mb-8">Your profile has been synchronized.</p>
+            <button onclick="window.location.href='index.html'" class="w-full bg-gray-900 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-orange-600 transition">Continue</button>
+        </div>
+    </div>
+
+    <footer class="bg-white py-10 border-t border-orange-50">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col items-center gap-4">
+            <div class="flex space-x-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                <a href="aboutus.html" class="hover:text-orange-600">Story</a>
+                <a href="menu.html" class="hover:text-orange-600">Shop</a>
+                <a href="orders.html" class="hover:text-orange-600">Orders</a>
+            </div>
+            <p class="text-gray-300 text-[9px] uppercase tracking-[0.4em]">Handmade with Love © 2025</p>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE = "http://localhost:5000/api/customers";
+        const token = localStorage.getItem("customerToken");
+
+        function setGreeting() {
+            const hour = new Date().getHours();
+            const greetEl = document.getElementById('greeting');
+            if (hour < 12) greetEl.innerText = "Good Morning! ☀️";
+            else if (hour < 18) greetEl.innerText = "Good Afternoon! 🌶️";
+            else greetEl.innerText = "Good Evening! 🌙";
+        }
+
+        window.onload = async () => {
+            setGreeting();
+            if (!token) window.location.href = "login.html";
+            try {
+                const res = await fetch(`${API_BASE}/details`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    document.getElementById('profileName').value = data.name || "";
+                    document.getElementById('profileEmail').value = data.email || "";
+                    document.getElementById('profilePhone').value = data.phone || "";
+                    document.getElementById('profileAddress').value = data.address || "";
+                    
+                    if(data.name) {
+                        document.getElementById('avatarCircle').innerText = data.name.charAt(0).toUpperCase();
+                        document.getElementById('displayNameHeader').innerText = data.name;
+                    }
+                }
+            } catch (err) { console.error(err); }
+        };
+
+        document.getElementById('profileForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const saveBtn = document.getElementById('saveBtn');
+            const btnText = document.getElementById('btnText');
+            const spinner = document.getElementById('loadingSpinner');
+
+            saveBtn.disabled = true;
+            btnText.innerText = "Saving...";
+            spinner.classList.remove('hidden');
+
+            const updatedData = {
+                name: document.getElementById('profileName').value,
+                phone: document.getElementById('profilePhone').value,
+                address: document.getElementById('profileAddress').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/details`, {
+                    method: "PUT",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}` 
+                    },
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (res.ok) {
+                    const customer = await res.json();
+                    localStorage.setItem("customerUser", JSON.stringify(customer));
+                    document.getElementById('successModal').classList.remove('hidden');
+                } else {
+                    alert("Session expired. Please log in again.");
+                }
+            } catch (err) { alert("Server error."); }
+            finally {
+                saveBtn.disabled = false;
+                btnText.innerText = "Update Account";
+                spinner.classList.add('hidden');
+            }
+        };
+
+        function handleLogout() {
+            localStorage.removeItem("customerToken");
+            localStorage.removeItem("customerUser");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

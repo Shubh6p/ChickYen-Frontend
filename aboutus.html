@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Yen Achar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        
+        .nav-custom {
+            background-color: rgba(255, 248, 240, 0.85); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(234, 88, 12, 0.05);
+            border-bottom: 1px solid rgba(234, 88, 12, 0.1);
+        }
+
+        .nav-item { position: relative; transition: color 0.3s ease; }
+
+        @media (min-width: 768px) {
+            .nav-item:hover::after {
+                content: '';
+                position: absolute;
+                width: 4px; height: 4px;
+                background-color: #ea580c;
+                bottom: -8px; left: 50%;
+                transform: translateX(-50%);
+                border-radius: 50%;
+            }
+        }
+
+        /* Mobile Menu Animation */
+        #mobile-menu {
+            transition: all 0.3s ease-in-out;
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        #mobile-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .footer-glass {
+            background-color: rgba(255, 248, 240, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(234, 88, 12, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-[#FFF8F0] min-h-screen flex flex-col">
+
+<nav class="nav-custom sticky top-0 z-50">
+    <div class="flex justify-between items-center px-6 md:px-10 py-5 max-w-7xl mx-auto w-full">
+        <div class="text-lg sm:text-2xl font-extrabold text-orange-600 flex items-center tracking-tight">
+            Chicken Pickle 
+            <span class="mx-2 sm:mx-3 h-4 sm:h-6 w-[1px] bg-orange-200 inline-block"></span> 
+            <span class="text-gray-800 font-bold">Yen Achar</span>
+        </div>
+
+        <div class="hidden md:flex space-x-8 lg:space-x-10 font-bold text-gray-700 items-center">
+            <a href="index.html" class="nav-item hover:text-orange-600">Home</a>
+            <a href="menu.html" class="nav-item hover:text-orange-600">Menu</a>
+            <a href="contactus.html" class="nav-item hover:text-orange-600">Contact Us</a>
+            <!-- ADD THIS INSIDE NAVBAR (near Order Now) -->
+            <span id="cartCount" class="ml-2 bg-yellow-400 text-black text-xs px-2 py-1 rounded-full hidden">0</span>
+
+            <!-- KEEP YOUR HTML AS IT IS -->
+
+        <button id="menu-toggle" class="md:hidden text-orange-600 focus:outline-none">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+        </button>
+    </div>
+
+    <div id="mobile-menu" class="absolute top-full left-0 w-full bg-[#FFF8F0] border-b border-orange-100 md:hidden flex flex-col p-6 space-y-4 font-bold text-gray-700 shadow-xl pointer-events-none">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="contactus.html">Contact Us Us</a>
+        <div id="mobile-auth-area" class="flex flex-col space-y-4">
+            </div>
+    </div>
+</nav>
+
+<section class="py-12 md:py-20 px-6 max-w-7xl mx-auto flex-grow">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        
+        <div class="relative order-1 lg:order-1">
+            <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80" 
+                 alt="Our Chef" class="rounded-[2rem] shadow-2xl relative z-10 w-full h-[350px] md:h-[500px] object-cover border-4 border-white">
+            
+            <div class="absolute -bottom-6 -right-2 md:-bottom-10 md:-right-6 lg:-right-10 z-20 bg-orange-600 text-white p-5 md:p-8 rounded-3xl shadow-xl max-w-[200px] md:max-w-xs transition-transform hover:scale-105">
+                <p class="text-xl md:text-3xl font-black mb-1">Made with Love</p>
+                <p class="text-orange-100 text-xs md:text-sm font-medium">Crafted with care and authentic Manipuri passion.</p>
+            </div>
+            
+            <div class="absolute top-10 -left-10 w-48 md:w-64 h-48 md:h-64 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse"></div>
+        </div>
+
+        <div class="space-y-6 md:space-y-8 order-2 lg:order-2">
+            <div class="text-center lg:text-left">
+                <span class="text-orange-600 font-bold tracking-widest uppercase text-xs md:text-sm">Our Story</span>
+                <h2 class="text-3xl md:text-5xl font-black mt-4 leading-tight">We Don’t Just Make Pickles, <br class="hidden md:block"> We <span class="text-orange-600">Create.</span></h2>
+            </div>
+
+            <p class="text-gray-500 text-base md:text-lg leading-relaxed text-center lg:text-left">
+                Born in Manipur, Yen Achar started with a single mission: to bring the bold, fermented, and spicy flavors of our heritage to food lovers everywhere. We use traditional smoking techniques and organic U-Morok to ensure every jar tells a story.
+            </p>
+
+            <div class="space-y-6">
+                <div class="flex items-center space-x-4 p-4 rounded-2xl bg-white/50 border border-orange-50 shadow-sm">
+                    <div class="bg-orange-100 p-3 rounded-xl text-orange-600 text-xl">🌿</div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-lg">100% Organic</h4>
+                        <p class="text-gray-500 text-sm">Locally sourced chicken and hand-picked spices.</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4 p-4 rounded-2xl bg-white/50 border border-orange-50 shadow-sm">
+                    <div class="bg-orange-100 p-3 rounded-xl text-orange-600 text-xl">👨‍🍳</div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-lg">Authentic Recipe</h4>
+                        <p class="text-gray-500 text-sm">Perfected over generations in Manipuri kitchens.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 flex justify-center lg:justify-start">
+                <a href="contactus.html" class="w-full sm:w-auto bg-black text-white px-8 py-4 rounded-2xl font-bold hover:bg-orange-600 transition shadow-lg flex items-center justify-center group">
+                    Let's Chat
+                    <span class="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer-glass">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-12 md:py-16 text-center sm:text-left">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
+            
+            <div class="flex flex-col items-center sm:items-start">
+                <div class="text-xl font-extrabold text-orange-600 flex items-center tracking-tight mb-6">
+                    Chicken Pickle <span class="mx-2 h-4 w-[1px] bg-orange-200"></span> <span class="text-gray-800">Yen Achar</span>
+                </div>
+                <p class="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto sm:mx-0">
+                    Bringing the authentic taste of Manipur to your doorstep. Handmade with love and tradition.
+                </p>
+                <div class="flex space-x-4 mt-6">
+                    <a href="#" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center hover:bg-orange-600 hover:text-white transition shadow-sm">FB</a>
+                    <a href="#" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center hover:bg-orange-600 hover:text-white transition shadow-sm">IG</a>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-gray-800 mb-6">Explore</h4>
+                <ul class="space-y-3 text-gray-500 text-sm">
+                    <li><a href="index.html" class="hover:text-orange-600 transition">Our Story</a></li>
+                    <li><a href="menu.html" class="hover:text-orange-600 transition">View Menu</a></li>
+                    <li><a href="#" class="hover:text-orange-600 transition">Shipping Policy</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-gray-800 mb-6">Contact</h4>
+                <ul class="space-y-3 text-gray-500 text-sm">
+                    <li>📍 Imphal West, Manipur</li>
+                    <li>📞 +91 98765 43210</li>
+                    <li>✉️ hello@yenachar.com</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-gray-800 mb-6 uppercase text-xs tracking-widest">Stay Spicy</h4>
+                <form class="flex flex-col space-y-2 max-w-xs mx-auto sm:mx-0">
+                    <input type="email" placeholder="Email" class="bg-white border border-orange-100 px-4 py-3 rounded-xl text-sm focus:ring-2 focus:ring-orange-600 outline-none">
+                    <button class="bg-gray-900 text-white py-3 rounded-xl font-bold hover:bg-orange-600 transition">Subscribe</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-12 pt-8 border-t border-orange-100 flex flex-col md:flex-row justify-between items-center text-gray-400 text-[10px] sm:text-xs uppercase tracking-widest gap-4">
+            <p>© 2025 Yen Achar. All Rights Reserved.</p>
+            <div class="flex space-x-6">
+                <a href="#" class="hover:text-orange-600">Privacy</a>
+                <a href="#" class="hover:text-orange-600">Terms</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Responsive Mobile Menu Logic
+    const btn = document.getElementById('menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+
+    btn.addEventListener('click', () => {
+        menu.classList.toggle('active');
+        menu.classList.toggle('pointer-events-none');
+    });
+
+    // Close menu when clicking a link
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            menu.classList.remove('active');
+            menu.classList.add('pointer-events-none');
+        });
+    });
+</script>
+
+</body>
+</html>
