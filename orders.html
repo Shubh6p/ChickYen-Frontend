@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track My Orders | Yen Achar</title>
+    <title>Track My Orders | ChickYen Achar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="assets/favicon.png">
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .nav-custom {
@@ -21,6 +25,85 @@
         .step-progress { position: absolute; top: 12px; left: 0; height: 2px; background: #ea580c; z-index: 1; transition: width 1s ease-in-out; }
         .step-node { position: relative; z-index: 2; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; background: #f3f4f6; }
         .step-node.active { background: #ea580c; box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.2); }
+        /* Success Modal Styling */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content-success {
+    background: white;
+    padding: 40px;
+    border-radius: 24px;
+    text-align: center;
+    max-width: 350px;
+    width: 90%;
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content-success {
+    transform: scale(1);
+}
+
+.success-icon {
+    width: 60px;
+    height: 60px;
+    background: #fffaf7;
+    border: 3px solid #ea580c;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+/* Auto-close Progress Bar */
+.progress-bar-modal {
+    width: 100%;
+    height: 4px;
+    background: #f3f4f6;
+    margin-top: 30px;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill-modal {
+    height: 100%;
+    background: #ea580c;
+    width: 100%;
+    animation: shrink 3s linear forwards;
+}
+
+@keyframes shrink {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* Spinner for the button */
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
     </style>
 </head>
 <body class="bg-[#FFF8F0] min-h-screen">
@@ -30,7 +113,7 @@
             <div class="text-xl sm:text-2xl font-extrabold text-orange-600 flex items-center tracking-tight">
                 Chicken Pickle 
                 <span class="mx-3 h-6 w-[1px] bg-orange-200 inline-block"></span> 
-                <span class="text-gray-800 font-bold">Yen Achar</span>
+                <span class="text-gray-800 font-bold">ChickYen Achar</span>
             </div>
             <div class="hidden md:flex space-x-10 font-bold text-gray-700 items-center">
                 <a href="index.html" class="hover:text-orange-600 transition">Home</a>
@@ -53,139 +136,361 @@
                     <p class="text-sm font-bold text-green-600">Securely Logged In</p>
                 </div>
             </div>
+
+            <div id="reviewModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md hidden px-4">
+                <div class="bg-white w-full max-w-md p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+                    <input type="hidden" id="targetOrderId">
+                    
+                    <div class="text-center mb-6">
+                        <h3 class="text-2xl font-black text-gray-900">Share Your <span class="text-orange-600">Experience</span></h3>
+                        <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-1">How was the heat?</p>
+                    </div>
+
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center block mb-2">Overall Rating</label>
+                    <div class="flex justify-center gap-2 mb-6">
+                        <span class="star-btn cursor-pointer text-4xl text-gray-200 hover:text-orange-400 transition-colors" data-value="1">★</span>
+                        <span class="star-btn cursor-pointer text-4xl text-gray-200 hover:text-orange-400 transition-colors" data-value="2">★</span>
+                        <span class="star-btn cursor-pointer text-4xl text-gray-200 hover:text-orange-400 transition-colors" data-value="3">★</span>
+                        <span class="star-btn cursor-pointer text-4xl text-gray-200 hover:text-orange-400 transition-colors" data-value="4">★</span>
+                        <span class="star-btn cursor-pointer text-4xl text-gray-200 hover:text-orange-400 transition-colors" data-value="5">★</span>
+                    </div>
+
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center block mb-2">Spice Intensity</label>
+                    <div class="flex justify-center gap-4 mb-6 bg-orange-50 p-4 rounded-2xl border border-orange-100">
+                        <span class="spice-btn cursor-pointer grayscale hover:grayscale-0 transition-all text-2xl" data-spice="1" title="Mild">🌶️</span>
+                        <span class="spice-btn cursor-pointer grayscale hover:grayscale-0 transition-all text-2xl" data-spice="2" title="Medium">🌶️</span>
+                        <span class="spice-btn cursor-pointer grayscale hover:grayscale-0 transition-all text-2xl" data-spice="3" title="Hot">🌶️</span>
+                        <span class="spice-btn cursor-pointer grayscale hover:grayscale-0 transition-all text-2xl" data-spice="4" title="Very Hot">🌶️</span>
+                        <span class="spice-btn cursor-pointer grayscale hover:grayscale-0 transition-all text-2xl" data-spice="5" title="U-Morok Level">🌶️</span>
+                    </div>
+
+                    <textarea id="reviewComment" placeholder="Describe the taste, crunch, and heat..." rows="3" 
+                        class="w-full bg-orange-50 border border-orange-100 p-5 rounded-2xl outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-600 font-bold transition-all resize-none mb-4"></textarea>
+
+                    <div class="mb-6">
+                        <input type="file" id="reviewImage" accept="image/*" 
+                            class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-orange-100 file:text-orange-600 cursor-pointer" />
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button id="submitBtn" onclick="submitReview()" class="flex-1 bg-gray-900 text-white font-black py-4 rounded-2xl hover:bg-orange-600 transition-all uppercase tracking-widest text-xs">
+                            Post Review
+                        </button>
+                        <button onclick="closeModal()" class="px-6 bg-gray-100 text-gray-400 font-black py-4 rounded-2xl hover:bg-gray-200 transition-all uppercase tracking-widest text-xs">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
             
             <div id="userOrdersList" class="space-y-8">
                 </div>
         </div>
+
+        <div id="successModal" class="modal-overlay">
+            <div class="modal-content-success">
+                <div class="success-icon">✅</div>
+                <h2 id="modalTitle" class="text-xl font-black text-gray-900 uppercase">Review Posted!</h2>
+                <p id="modalMessage" class="text-gray-500 text-sm mt-2">Your experience has been shared successfully.</p>
+                <div class="progress-bar-modal">
+                    <div class="progress-fill-modal"></div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
-        const API_URL = "https://chickyen-backend.onrender.com/api";
-        const token = localStorage.getItem("customerToken");
+        const API_URL = "http://localhost:5000/api";
+const token = localStorage.getItem("customerToken");
+let selectedRating = 0;
+let selectedSpice = 0; // New variable for spice level
 
-        if (!token) window.location.href = "login.html";
+if (!token) window.location.href = "login.html";
 
-        function logout() {
-            localStorage.removeItem("customerToken");
-            localStorage.removeItem("customerUser");
-            window.location.href = "login.html";
+function handleLogout() {
+    localStorage.removeItem("customerToken");
+    localStorage.removeItem("customerUser");
+    window.location.href = "login.html";
+}
+
+const statusSteps = ["Processing", "Verified", "Packed", "Out for Delivery", "Delivered"];
+
+/* =========================
+   LOAD ORDERS LOGIC
+========================= */
+
+async function loadMyOrders() {
+    try {
+        const list = document.getElementById("userOrdersList");
+        
+        // 1. Fetch Orders and the customer's Review history simultaneously
+        // Note: Using /reviews/all for now, but in production, use a specific user route like /reviews/my-reviews
+        const [ordersRes, reviewsRes] = await Promise.all([
+            fetch(`${API_URL}/orders/user-history`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            }),
+            fetch(`${API_URL}/reviews/all`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            })
+        ]);
+        
+        const ordersData = await ordersRes.json();
+        const reviewsData = await reviewsRes.json();
+
+        if (!ordersRes.ok) {
+            list.innerHTML = `<div class="bg-red-50 text-red-600 p-6 rounded-3xl font-bold">Error: ${ordersData.error || "Could not load history"}</div>`;
+            return;
         }
 
-        const statusSteps = ["Processing", "Verified", "Packed", "Out for Delivery", "Delivered"];
+        if (ordersData.length === 0) {
+            list.innerHTML = `<div class="text-center py-20 bg-white rounded-[3rem] border border-dashed border-orange-200">
+                <p class="text-gray-400 font-bold">No orders found in your account.</p>
+                <a href="menu.html" class="mt-4 inline-block text-orange-600 font-black">Go to Menu →</a>
+            </div>`;
+            return;
+        }
 
-        async function loadMyOrders() {
-            try {
-                const res = await fetch(`${API_URL}/orders/user-history`, {
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
-                
-                const data = await res.json();
-                const list = document.getElementById("userOrdersList");
+        list.innerHTML = ordersData.map(o => {
+            const statusIndex = statusSteps.indexOf(o.status);
+            const progressWidth = `${(Math.max(0, statusIndex) / (statusSteps.length - 1)) * 100}%`;
+            const isDelivered = o.status === "Delivered";
+            
+            // 2. Check if this specific order ID has already been reviewed
+            const alreadyReviewed = reviewsData.some(r => r.orderId === o._id);
 
-                if (!res.ok || !Array.isArray(data)) {
-                    list.innerHTML = `<div class="bg-red-50 text-red-600 p-6 rounded-3xl font-bold">Error: ${data.error || "Could not load history"}</div>`;
-                    return;
-                }
+            return `
+            <div class="order-card p-6 md:p-10 rounded-[3.5rem] shadow-xl relative overflow-hidden mb-8 transition-all hover:shadow-2xl">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-[5rem] -z-10 opacity-50"></div>
 
-                if (data.length === 0) {
-                    list.innerHTML = `<div class="text-center py-20 bg-white rounded-[3rem] border border-dashed border-orange-200">
-                        <p class="text-gray-400 font-bold">No orders found in your account.</p>
-                        <a href="menu.html" class="mt-4 inline-block text-orange-600 font-black">Go to Menu →</a>
-                    </div>`;
-                    return;
-                }
+                <div class="flex flex-col md:flex-row justify-between border-b border-gray-100 pb-6 mb-8 gap-4">
+                    <div>
+                        <span class="text-[10px] font-black bg-gray-900 text-white px-3 py-1 rounded-lg uppercase tracking-widest">Order #${o.orderId}</span>
+                        <p class="text-xs text-gray-400 font-bold mt-2 uppercase">Placed on ${new Date(o.createdAt).toLocaleDateString('en-IN', { dateStyle: 'long' })}</p>
+                    </div>
+                    <div class="md:text-right">
+                        <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Grand Total</p>
+                        <p class="text-3xl font-black text-orange-600">₹${o.totalAmount}</p>
+                    </div>
+                </div>
 
-                list.innerHTML = data.map(o => {
-                    const statusIndex = statusSteps.indexOf(o.status);
-                    const progressWidth = `${(Math.max(0, statusIndex) / (statusSteps.length - 1)) * 100}%`;
-
-                    return `
-                    <div class="order-card p-6 md:p-10 rounded-[3rem] shadow-xl relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-[5rem] -z-10 opacity-50"></div>
-
-                        <div class="flex flex-col md:flex-row justify-between border-b border-gray-100 pb-6 mb-8 gap-4">
-                            <div>
-                                <span class="text-[10px] font-black bg-gray-900 text-white px-3 py-1 rounded-lg uppercase tracking-widest">Order #${o.orderId}</span>
-                                <p class="text-xs text-gray-400 font-bold mt-2 uppercase">Placed on ${new Date(o.createdAt).toLocaleDateString('en-IN', { dateStyle: 'long' })}</p>
-                            </div>
-                            <div class="md:text-right">
-                                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Grand Total</p>
-                                <p class="text-3xl font-black text-orange-600">₹${o.totalAmount}</p>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10">
-                            <div>
-                                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center">
-                                    <span class="mr-2">📍</span> Pickup Address
-                                </h4>
-                                <div class="bg-orange-50/50 p-5 rounded-2xl border border-orange-100">
-                                    <p class="font-bold text-gray-800">${o.customerName}</p>
-                                    <p class="text-sm text-gray-600 mt-1 leading-relaxed">${o.pickupLocation?.fullAddress || 'Address details unavailable'}</p>
-                                    <p class="text-xs font-bold text-gray-500 mt-3">📞 ${o.phone || 'N/A'}</p>
-                                </div>
-                            </div>
-
-                            <div>
-                                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center">
-                                    <span class="mr-2">🛍️</span> Order Summary
-                                </h4>
-                                <ul class="space-y-3">
-                                    ${o.items.map(item => `
-                                        <li class="flex justify-between items-center text-sm">
-                                            <span class="font-bold text-gray-700">${item.name} <span class="text-gray-400 ml-1">x${item.quantity}</span></span>
-                                            <span class="font-black text-gray-900">${item.weight}</span>
-                                            <span class="font-black text-gray-900">₹${item.price * item.quantity}</span>
-                                        </li>
-                                    `).join('')}
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="relative py-10">
-                            <div class="step-line"></div>
-                            <div class="step-progress" style="width: ${progressWidth}"></div>
-                            <div class="flex justify-between relative">
-                                ${statusSteps.map((step, idx) => `
-                                    <div class="flex flex-col items-center">
-                                        <div class="step-node ${idx <= statusIndex ? 'active' : ''}">
-                                            ${idx <= statusIndex ? '✅' : ''}
-                                        </div>
-                                        <span class="text-[8px] md:text-[10px] font-black uppercase mt-3 ${idx <= statusIndex ? 'text-orange-600' : 'text-gray-300'} text-center">${step}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
-                            <p class="text-xs font-bold text-gray-500">Current Status: <span class="text-orange-600 font-black uppercase tracking-widest">${o.status}</span></p>
-                            
-                            <div class="flex gap-3 w-full md:w-auto">
-                                ${o.status === "Delivered" ? `
-                                    <button onclick="downloadUserInvoice('${o._id}')" class="flex-1 md:flex-none bg-green-600 hover:bg-green-700 text-white text-[10px] font-black uppercase px-8 py-4 rounded-2xl shadow-lg transition-all">
-                                        📄 Download Invoice
-                                    </button>
-                                ` : `
-                                    <button disabled class="flex-1 md:flex-none bg-gray-100 text-gray-400 text-[10px] font-black uppercase px-8 py-4 rounded-2xl cursor-not-allowed">
-                                        Invoice available after delivery
-                                    </button>
-                                `}
-                            </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10">
+                    <div>
+                        <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center">
+                            <span class="mr-2">📍</span> Pickup Address
+                        </h4>
+                        <div class="bg-orange-50/50 p-5 rounded-2xl border border-orange-100">
+                            <p class="font-bold text-gray-800">${o.customerName}</p>
+                            <p class="text-sm text-gray-600 mt-1 leading-relaxed">${o.pickupLocation?.fullAddress || 'Address details unavailable'}</p>
+                            <p class="text-xs font-bold text-gray-500 mt-3">📞 ${o.phone || 'N/A'}</p>
                         </div>
                     </div>
-                    `;
-                }).join("");
-            } catch (err) {
-                console.error(err);
-            }
-        }
 
-        function downloadUserInvoice(orderId) {
-            const invoiceUrl = `${API_URL}/orders/invoice/${orderId}?token=${token}`;
-            window.open(invoiceUrl, '_blank');
-        }
+                    <div>
+                        <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center">
+                            <span class="mr-2">🛍️</span> Order Summary
+                        </h4>
+                        <ul class="space-y-3">
+                            ${o.items.map(item => `
+                                <li class="flex justify-between items-center text-sm">
+                                    <span class="font-bold text-gray-700">${item.name} <span class="text-gray-400 ml-1">x${item.quantity}</span></span>
+                                    <span class="font-black text-gray-900">${item.weight}</span>
+                                    <span class="font-black text-gray-900">₹${item.price * item.quantity}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
 
-        window.onload = loadMyOrders;
+                <div class="relative py-10">
+                    <div class="step-line"></div>
+                    <div class="step-progress" style="width: ${progressWidth}"></div>
+                    <div class="flex justify-between relative">
+                        ${statusSteps.map((step, idx) => `
+                            <div class="flex flex-col items-center">
+                                <div class="step-node ${idx <= statusIndex ? 'active' : ''}">
+                                    ${idx <= statusIndex ? '✅' : ''}
+                                </div>
+                                <span class="text-[8px] md:text-[10px] font-black uppercase mt-3 ${idx <= statusIndex ? 'text-orange-600' : 'text-gray-300'} text-center">${step}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
+                    <p class="text-xs font-bold text-gray-500">Current Status: <span class="text-orange-600 font-black uppercase tracking-widest">${o.status}</span></p>
+                    
+                    <div class="flex gap-3 w-full md:w-auto">
+                        ${isDelivered ? (
+                            alreadyReviewed ? `
+                                <div class="flex-1 md:flex-none bg-green-50 text-green-600 text-[10px] font-black uppercase px-8 py-4 rounded-2xl border border-green-100 flex items-center gap-2">
+                                    <span>✅</span> Review Submitted
+                                </div>
+                            ` : `
+                                <button onclick="openReviewModal('${o._id}')" class="flex-1 md:flex-none bg-orange-600 hover:bg-black text-white text-[10px] font-black uppercase px-8 py-4 rounded-2xl shadow-lg transition-all">
+                                    ⭐ Review Product
+                                </button>
+                            `
+                        ) : `
+                            <button disabled class="flex-1 md:flex-none bg-gray-100 text-gray-400 text-[10px] font-black uppercase px-8 py-4 rounded-2xl cursor-not-allowed">
+                                Review available after delivery
+                            </button>
+                        `}
+                        
+                        <button onclick="downloadUserInvoice('${o._id}')" class="flex-1 md:flex-none bg-gray-900 hover:bg-orange-600 text-white text-[10px] font-black uppercase px-8 py-4 rounded-2xl shadow-lg transition-all">
+                            📄 Invoice
+                        </button>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join("");
+    } catch (err) {
+        console.error("Load Orders Error:", err);
+    }
+}
+
+/* =========================
+   REVIEW SYSTEM LOGIC
+========================= */
+function openReviewModal(orderId) {
+    document.getElementById('reviewModal').classList.remove('hidden');
+    document.getElementById('targetOrderId').value = orderId;
+    resetStars();
+}
+
+function closeModal() {
+    document.getElementById('reviewModal').classList.add('hidden');
+}
+
+document.querySelectorAll('.star-btn').forEach(star => {
+    star.addEventListener('click', (e) => {
+        selectedRating = e.target.getAttribute('data-value');
+        updateStars(selectedRating);
+    });
+});
+
+function updateStars(rating) {
+    document.querySelectorAll('.star-btn').forEach(star => {
+        const val = star.getAttribute('data-value');
+        // Colors the stars orange if they are within the rating, gray if not
+        star.classList.toggle('text-orange-600', val <= rating);
+        star.classList.toggle('text-gray-200', val > rating);
+    });
+}
+
+function resetStars() {
+    selectedRating = 0;
+    selectedSpice = 0; // Reset spice too
+    updateStars(0);
+    updateSpiceMeter(0); // Clear spice meter colors
+    document.getElementById('reviewComment').value = '';
+    document.getElementById('reviewImage').value = ''; // Clear file input
+}
+
+
+
+// Handle Spice Selection
+document.querySelectorAll('.spice-btn').forEach(chili => {
+    chili.addEventListener('click', (e) => {
+        selectedSpice = e.target.getAttribute('data-spice');
+        updateSpiceMeter(selectedSpice);
+    });
+});
+
+function updateSpiceMeter(level) {
+    document.querySelectorAll('.spice-btn').forEach(chili => {
+        const val = chili.getAttribute('data-spice');
+        // If the chili level is less than or equal to selected, show color, else grayscale
+        chili.style.filter = val <= level ? 'grayscale(0) drop-shadow(0 0 5px rgba(234, 88, 12, 0.5))' : 'grayscale(1)';
+        chili.style.transform = val <= level ? 'scale(1.2)' : 'scale(1)';
+    });
+}
+
+// Update the submitReview function to include spiceLevel
+async function submitReview() {
+    const orderId = document.getElementById('targetOrderId').value;
+    const comment = document.getElementById('reviewComment').value;
+    const imageFile = document.getElementById('reviewImage').files[0];
+    const customerUser = JSON.parse(localStorage.getItem("customerUser"));
+    const btn = document.getElementById('submitBtn');
+
+    // Validation
+    if (!selectedRating || !selectedSpice || !comment.trim()) {
+        triggerSuccessModal("Incomplete", "Please provide a rating, spice level, and comment.");
+        return;
+    }
+
+    // Visual Loading State: Prevent the button from appearing blank
+    const originalText = "Post Review";
+    btn.disabled = true;
+    btn.innerHTML = `<div class="flex items-center justify-center"><div class="loading-spinner"></div></div>`;
+
+    const formData = new FormData();
+    formData.append("orderId", orderId);
+    formData.append("customerId", customerUser._id);
+    formData.append("customerName", customerUser.name);
+    formData.append("rating", selectedRating);
+    formData.append("spiceLevel", selectedSpice);
+    formData.append("comment", comment);
+    
+    if (imageFile) {
+        formData.append("reviewImage", imageFile);
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/reviews/add`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}` },
+            body: formData 
+        });
+
+        if (res.ok) {
+            // Trigger the success modal with your specific message
+            triggerSuccessModal("Review Posted!", "Your review has been submitted and will be available on the reviews page soon.");
+            
+            // Wait for modal display before reloading
+            setTimeout(() => {
+                location.reload(); 
+            }, 3000);
+        } else {
+            const data = await res.json();
+            triggerSuccessModal("Submission Failed", data.error || "Please try again.");
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    } catch (err) {
+        console.error("Submission Error:", err);
+        triggerSuccessModal("Server Error", "Could not connect to the database.");
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+function triggerSuccessModal(title, message) {
+    const modal = document.getElementById('successModal');
+    const titleEl = document.getElementById('modalTitle');
+    const msgEl = document.getElementById('modalMessage');
+
+    titleEl.innerText = title;
+    msgEl.innerText = message;
+
+    modal.classList.add('active');
+
+    // Auto close and clean up
+    setTimeout(() => {
+        modal.classList.remove('active');
+    }, 3000);
+}
+
+/* =========================
+   UTILITIES
+========================= */
+function downloadUserInvoice(orderId) {
+    const invoiceUrl = `${API_URL}/orders/invoice/${orderId}?token=${token}`;
+    window.open(invoiceUrl, '_blank');
+}
+
+window.onload = loadMyOrders;
     </script>
 </body>
 </html>

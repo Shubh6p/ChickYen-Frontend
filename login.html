@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Login | Yen Achar</title>
+    <title>Customer Login | ChickYen Achar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="assets/favicon.png">
+
     <style>
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
@@ -29,7 +32,7 @@
             <h2 class="text-3xl font-black text-gray-900 mt-2">Customer <span class="text-orange-600">Login</span></h2>
         </div>
 
-        <form id="loginForm" class="space-y-4">
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
             <div class="text-left">
                 <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4 mb-1 block">Email Address</label>
                 <input type="email" id="email" placeholder="Enter your email" 
@@ -38,11 +41,17 @@
 
             <div class="text-left">
                 <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4 mb-1 block">Password</label>
-                <input type="password" id="password" placeholder="••••••••" 
-                    class="w-full bg-white border border-orange-100 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-orange-600 outline-none transition-all placeholder:text-gray-300" required />
+                <div class="relative">
+                    <input type="password" id="password" placeholder="••••••••" 
+                        class="w-full bg-white border border-orange-100 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-orange-600 outline-none transition-all placeholder:text-gray-300 pr-12" required />
+                    
+                    <button type="button" onclick="togglePasswordVisibility()" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors">
+                        <i id="toggleIcon" class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
             </div>
 
-            <button type="submit" 
+            <button type="submit" id="loginBtn"
                 class="w-full bg-gray-900 text-white font-bold py-4 rounded-2xl hover:bg-orange-600 transition-all shadow-lg active:scale-95 uppercase tracking-widest text-sm mt-4">
                 Login
             </button>
@@ -58,8 +67,19 @@
         </div>
         
         <a href="index.html" class="inline-block mt-6 text-[10px] font-bold text-gray-400 uppercase tracking-tighter hover:text-orange-600">
-            ← Back to Yen Achar
+            ← Back to ChickYen Achar
         </a>
+    </div>
+
+    <div id="loginStatusModal" class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-md hidden px-4">
+        <div class="bg-white w-full max-w-sm p-8 rounded-[2.5rem] shadow-2xl text-center border-t-8 border-orange-600">
+            <div id="statusIcon" class="text-5xl mb-4">🔍</div>
+            <h3 id="statusTitle" class="text-2xl font-black text-gray-900 uppercase tracking-tight">Account Not Found</h3>
+            <p id="statusDescription" class="text-gray-500 text-sm mt-2 mb-8 font-medium">This email isn't registered yet.</p>
+            
+            <div class="flex flex-col gap-3" id="modalActionContainer">
+                </div>
+        </div>
     </div>
 
     <script src="customer-auth.js"></script>

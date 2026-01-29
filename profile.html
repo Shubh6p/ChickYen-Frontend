@@ -6,6 +6,10 @@
     <title>My Account | Yen Achar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="assets/favicon.png">
+
     <style>
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
@@ -81,30 +85,66 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Your Full Name</label>
-                        <input type="text" id="profileName" class="input-field w-full bg-orange-50/30 px-5 py-3.5 rounded-2xl outline-none font-bold text-gray-800 text-sm" required>
+                        <input type="text" id="profileName" 
+                            class="input-field w-full bg-orange-50/30 px-5 py-3.5 rounded-2xl outline-none font-bold text-gray-800 text-sm" 
+                            placeholder="Enter full name" required>
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
-                        <input type="text" id="profilePhone" class="input-field w-full bg-orange-50/30 px-5 py-3.5 rounded-2xl outline-none font-bold text-gray-800 text-sm" required>
+
+                    <div class="space-y-2 relative">
+                        <div class="flex justify-between items-center ml-1">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Phone Number</label>
+                            
+                            <div id="verifiedContainer" class="hidden flex items-center gap-2">
+                                <span class="text-green-600 font-black text-[9px] uppercase tracking-widest flex items-center gap-1">
+                                    <i class="fa-solid fa-circle-check"></i> Verified
+                                </span>
+                                <button type="button" onclick="enablePhoneEdit()" 
+                                    class="text-orange-600 hover:text-black text-[9px] font-black uppercase tracking-widest transition-colors">
+                                    (Change)
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="relative group">
+                            <input type="text" id="profilePhone" 
+                                class="input-field w-full bg-orange-50/30 px-5 py-3.5 rounded-2xl outline-none font-bold text-gray-800 text-sm" 
+                                placeholder="Enter phone number" required>
+                            
+                            <button type="button" id="verifyPhoneBtn" onclick="sendPhoneOTP()" 
+                                class="absolute right-2 top-1.5 bg-orange-600 text-white text-[9px] font-black px-4 py-2 rounded-xl hover:bg-black transition-all uppercase tracking-widest shadow-md">
+                                Verify Now
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="space-y-2 group opacity-70">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Login Email (Verified)</label>
-                    <input type="email" id="profileEmail" class="w-full bg-gray-100 border border-gray-200 px-5 py-3.5 rounded-2xl text-gray-400 font-medium text-sm cursor-not-allowed" readonly>
+                <div class="space-y-2 group opacity-90 relative">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Login Email</label>
+                    <div class="relative">
+                        <input type="email" id="profileEmail" 
+                            class="w-full bg-gray-100 border border-gray-200 px-5 py-3.5 rounded-2xl text-gray-400 font-bold text-sm cursor-not-allowed" 
+                            readonly required>
+                        <span id="emailVerifiedBadge" class="absolute right-4 top-1/2 -translate-y-1/2 text-green-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-1">
+                            <i class="fa-solid fa-circle-check"></i> Verified
+                        </span>
+                    </div>
                 </div>
 
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Main Delivery Address</label>
-                    <textarea id="profileAddress" rows="2" class="input-field w-full bg-orange-50/30 px-5 py-3.5 rounded-2xl outline-none resize-none font-medium text-gray-700 text-sm" required></textarea>
+                    <textarea id="profileAddress" rows="2" 
+                        class="input-field w-full bg-orange-50/30 px-5 py-3.5 rounded-2xl outline-none resize-none font-medium text-gray-700 text-sm" 
+                        placeholder="Enter your full address" required></textarea>
                 </div>
 
                 <div class="flex gap-4 pt-4">
-                    <button type="submit" id="saveBtn" class="flex-[2] bg-gray-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-orange-600 hover:-translate-y-1 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                    <button type="submit" id="saveBtn" 
+                        class="flex-[2] bg-gray-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-orange-600 hover:-translate-y-1 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2">
                         <span id="btnText">Update Account</span>
                         <span id="loadingSpinner" class="hidden animate-spin">⌛</span>
                     </button>
-                    <a href="index.html" class="flex-1 bg-white border-2 border-orange-100 text-orange-600 font-bold py-4 rounded-2xl text-center hover:bg-orange-50 transition text-xs uppercase tracking-widest flex items-center justify-center">
+                    <a href="index.html" 
+                        class="flex-1 bg-white border-2 border-orange-100 text-orange-600 font-bold py-4 rounded-2xl text-center hover:bg-orange-50 transition text-xs uppercase tracking-widest flex items-center justify-center">
                         Back
                     </a>
                 </div>
@@ -121,20 +161,123 @@
         </div>
     </div>
 
-    <footer class="bg-white py-10 border-t border-orange-50">
-        <div class="max-w-6xl mx-auto px-6 flex flex-col items-center gap-4">
-            <div class="flex space-x-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
-                <a href="aboutus.html" class="hover:text-orange-600">Story</a>
-                <a href="menu.html" class="hover:text-orange-600">Shop</a>
-                <a href="orders.html" class="hover:text-orange-600">Orders</a>
+    <div id="phoneOtpModal" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-md hidden px-4">
+        <div class="bg-white w-full max-w-xs p-8 rounded-[3rem] text-center border-t-8 border-orange-600 shadow-2xl">
+            <div class="text-4xl mb-4">📱</div>
+            <h3 class="text-xl font-black text-gray-900 uppercase">Verify Phone</h3>
+            <p class="text-gray-400 text-[10px] font-bold uppercase mt-2 mb-6">Enter the 6-digit code sent to your phone</p>
+            
+            <input type="text" id="phoneOtpInput" maxlength="6" 
+                class="w-full bg-orange-50 border-2 border-dashed border-orange-200 px-5 py-4 rounded-2xl outline-none text-center tracking-[0.5em] font-black text-orange-600 text-xl mb-6 focus:border-orange-600 transition-all">
+            
+            <div class="flex flex-col gap-3">
+                <button onclick="confirmPhoneOTP()" id="confirmOtpBtn" 
+                    class="w-full bg-gray-900 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-orange-600 transition uppercase tracking-widest text-xs">
+                    Confirm OTP
+                </button>
+                
+                <div id="resendTimerContainer" class="mt-2">
+                    <p id="timerText" class="text-[10px] font-bold text-gray-400 uppercase">Resend code in <span id="timerSeconds" class="text-orange-600">30</span>s</p>
+                    <button type="button" id="resendOtpBtn" onclick="resendPhoneOTP()" 
+                        class="hidden text-[10px] font-black text-orange-600 uppercase hover:underline tracking-widest">
+                        Resend Code
+                    </button>
+                </div>
+
+                <button onclick="togglePhoneModal(false)" class="text-[10px] font-bold text-gray-400 uppercase hover:text-red-500 transition">Cancel</button>
             </div>
-            <p class="text-gray-300 text-[9px] uppercase tracking-[0.4em]">Handmade with Love © 2025</p>
         </div>
-    </footer>
+    </div>
+
+    <footer class="footer-glass">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-12 md:py-16">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
+            <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
+                <div class="text-xl font-extrabold text-orange-600 flex items-center tracking-tight mb-6">
+                    Chicken Pickle <span class="mx-2 h-4 w-[1px] bg-orange-200"></span> <span class="text-gray-800">Yen Achar</span>
+                </div>
+                <p class="text-gray-500 text-sm leading-relaxed max-w-xs">Authentic Manipuri taste delivered to your doorstep. Handmade with love.</p>
+                
+                <div class="flex space-x-4 mt-6">
+                    <a href="#" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-[#1877F2] hover:text-white transition-all shadow-sm group">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+
+                    <a href="#" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7] hover:text-white transition-all shadow-sm">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <a href="https://wa.me/919876543210" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-[#25D366] hover:text-white transition-all shadow-sm">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                    </a>
+
+                    <a href="mailto:hello@yenachar.com" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-[#EA4335] hover:text-white transition-all shadow-sm">
+                        <i class="fa-solid fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="text-center sm:text-left">
+                <h4 class="font-bold text-gray-800 mb-6">Explore</h4>
+                <ul class="space-y-3 text-gray-500 text-sm">
+                    <li><a href="aboutus.html" class="hover:text-orange-600">Our Story</a></li>
+                    <li><a href="menu.html" class="hover:text-orange-600">View Menu</a></li>
+                    <li><a href="shipping-policy.html" class="hover:text-orange-600">Shipping Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="text-center sm:text-left">
+                <h4 class="font-bold text-gray-800 mb-6">Contact</h4>
+                <ul class="space-y-3 text-gray-500 text-sm">
+                    <li>📍Near Parul University</li>
+                    <li>📞 +91 80020 12665</li>
+                    <li>✉️ hello@yenachar.com</li>
+                </ul>
+            </div>
+
+            <div class="text-center sm:text-left">
+                <h4 class="font-bold text-gray-800 mb-6">Stay Spicy</h4>
+                <form class="flex flex-col space-y-2">
+                    <input type="email" placeholder="Email" class="bg-white border border-orange-100 px-4 py-3 rounded-xl text-sm focus:ring-2 focus:ring-orange-600 outline-none">
+                    <button class="bg-gray-900 text-white py-3 rounded-xl font-bold hover:bg-orange-600 transition">Subscribe</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-12 pt-8 border-t border-orange-100 flex flex-col md:flex-row justify-between items-center text-gray-400 text-[10px] sm:text-xs uppercase tracking-widest text-center gap-4">
+            <p>© 2025 Yen Achar. All Rights Reserved.</p>
+            <div class="flex space-x-6">
+                <a href="privacy-policy.html" class="hover:text-orange-600">Privacy</a>
+                <a href="privacy-policy.html" class="hover:text-orange-600">Terms</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <div id="phoneWarningModal" class="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-md hidden px-4">
+        <div class="bg-white w-full max-w-xs p-8 rounded-[3rem] text-center border-t-8 border-orange-500 shadow-2xl">
+            <div class="text-4xl mb-4">⚠️</div>
+            <h3 class="text-xl font-black text-gray-900 uppercase">Important!</h3>
+            <p class="text-gray-500 text-[11px] font-bold uppercase mt-3 mb-6 leading-relaxed">
+                If you change your number, you <span class="text-orange-600">must verify it</span> immediately via OTP. Unverified numbers will not be saved.
+            </p>
+            
+            <div class="flex flex-col gap-3">
+                <button onclick="confirmPhoneChange()" class="w-full bg-gray-900 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-orange-600 transition uppercase tracking-widest text-xs">
+                    I Understand
+                </button>
+                <button onclick="toggleWarningModal(false)" class="text-[10px] font-bold text-gray-400 uppercase hover:text-red-500 transition">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        const API_BASE = "https://chickyen-backend.onrender.com/apicustomers";
+        const API_BASE = "http://localhost:5000/api/customers";
         const token = localStorage.getItem("customerToken");
+        let resendTimer;
+        const RESEND_TIME = 30;
 
         function setGreeting() {
             const hour = new Date().getHours();
@@ -145,29 +288,60 @@
         }
 
         window.onload = async () => {
-            setGreeting();
-            if (!token) window.location.href = "login.html";
-            try {
-                const res = await fetch(`${API_BASE}/details`, {
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    document.getElementById('profileName').value = data.name || "";
-                    document.getElementById('profileEmail').value = data.email || "";
-                    document.getElementById('profilePhone').value = data.phone || "";
-                    document.getElementById('profileAddress').value = data.address || "";
-                    
-                    if(data.name) {
-                        document.getElementById('avatarCircle').innerText = data.name.charAt(0).toUpperCase();
-                        document.getElementById('displayNameHeader').innerText = data.name;
-                    }
-                }
-            } catch (err) { console.error(err); }
-        };
+    setGreeting();
+    if (!token) window.location.href = "login.html";
+    
+    try {
+        const res = await fetch(`${API_BASE}/details`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+            // Populate basic profile data
+            document.getElementById('profileName').value = data.name || "";
+            document.getElementById('profileEmail').value = data.email || "";
+            document.getElementById('profilePhone').value = data.phone || "";
+            document.getElementById('profileAddress').value = data.address || "";
+            
+            // ✅ Handle Email Verification UI State
+            const emailBadge = document.getElementById('emailVerifiedBadge');
+            if (data.isEmailVerified) {
+                emailBadge.classList.remove('hidden');
+            } else {
+                emailBadge.classList.add('hidden');
+            }
+
+            // ✅ Handle Phone Verification UI State
+            if (data.isPhoneVerified) {
+                document.getElementById('verifyPhoneBtn').classList.add('hidden');
+                document.getElementById('verifiedContainer').classList.remove('hidden'); // Updated from verifiedBadge
+                document.getElementById('profilePhone').readOnly = true;
+                document.getElementById('profilePhone').classList.add('opacity-70', 'cursor-not-allowed');
+            }
+
+            // Update Avatar and Header
+            if (data.name) {
+                document.getElementById('avatarCircle').innerText = data.name.charAt(0).toUpperCase();
+                document.getElementById('displayNameHeader').innerText = data.name;
+            }
+        }
+    } catch (err) { 
+        console.error("Profile load error:", err); 
+    }
+};
 
         document.getElementById('profileForm').onsubmit = async (e) => {
             e.preventDefault();
+
+            const phoneInput = document.getElementById('profilePhone');
+            const verifyBtn = document.getElementById('verifyPhoneBtn');
+
+            // Prevent submission if phone is editable and verify button is visible
+            if (!phoneInput.readOnly && !verifyBtn.classList.contains('hidden')) {
+                alert("Please verify your new phone number before updating your profile!");
+                return;
+            }
             const saveBtn = document.getElementById('saveBtn');
             const btnText = document.getElementById('btnText');
             const spinner = document.getElementById('loadingSpinner');
@@ -206,6 +380,180 @@
                 spinner.classList.add('hidden');
             }
         };
+
+        // Toggle Modal Visibility
+function togglePhoneModal(show) {
+    const modal = document.getElementById('phoneOtpModal');
+    modal.classList.toggle('hidden', !show);
+}
+
+// 1. Send OTP to Phone
+async function sendPhoneOTP() {
+    const phone = document.getElementById('profilePhone').value;
+    if (!phone || phone.length < 10) {
+        alert("Please enter a valid phone number first.");
+        return;
+    }
+
+    const verifyBtn = document.getElementById('verifyPhoneBtn');
+    verifyBtn.innerText = "Sending...";
+    verifyBtn.disabled = true;
+
+    try {
+        const res = await fetch(`${API_BASE}/send-phone-otp`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // This must be passed
+            },
+            body: JSON.stringify({ phone })
+        });
+
+        if (res.ok) {
+            togglePhoneModal(true);
+            startResendTimer(); // ✅ Start the 30s countdown
+        } else {
+            const data = await res.json();
+            alert(data.error || "Failed to send OTP");
+        }
+    } catch (err) { 
+        alert("Network error"); 
+    } finally { 
+        verifyBtn.innerText = "Verify Now"; 
+        verifyBtn.disabled = false; 
+    }
+}
+
+// 2. Confirm OTP and Verify Phone
+async function confirmPhoneOTP() {
+    const otp = document.getElementById('phoneOtpInput').value;
+    const phone = document.getElementById('profilePhone').value;
+    const confirmBtn = document.getElementById('confirmOtpBtn');
+
+    confirmBtn.disabled = true;
+    confirmBtn.innerText = "Checking...";
+
+    try {
+        const res = await fetch(`${API_BASE}/verify-phone-otp`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` 
+            },
+            body: JSON.stringify({ phone, otp })
+        });
+
+        if (res.ok) {
+            // 1. Refresh profile data from server to keep everything in sync
+            const profileRes = await fetch(`${API_BASE}/details`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            
+            if (profileRes.ok) {
+                const updatedCustomer = await profileRes.json();
+                localStorage.setItem("customerUser", JSON.stringify(updatedCustomer));
+                
+                // 2. FIXED UI LOGIC: Targeting 'verifiedContainer' instead of 'verifiedBadge'
+                const phoneInput = document.getElementById('profilePhone');
+                const verifyBtn = document.getElementById('verifyPhoneBtn');
+                const verifiedContainer = document.getElementById('verifiedContainer');
+
+                phoneInput.readOnly = true;
+                phoneInput.classList.add('opacity-70', 'cursor-not-allowed');
+                verifyBtn.classList.add('hidden');
+                verifiedContainer.classList.remove('hidden'); // This was the line causing the error
+                
+                // Update Avatar and Header
+                if (updatedCustomer.name) {
+                    document.getElementById('avatarCircle').innerText = updatedCustomer.name.charAt(0).toUpperCase();
+                    document.getElementById('displayNameHeader').innerText = updatedCustomer.name;
+                }
+            }
+
+            togglePhoneModal(false);
+            
+            // Trigger success feedback
+            const successModal = document.getElementById('successModal');
+            const modalTitle = successModal.querySelector('h3');
+            const modalText = successModal.querySelector('p');
+            
+            if (modalTitle) modalTitle.innerText = "Phone Verified!";
+            if (modalText) modalText.innerText = "Your mobile number is now securely linked to your account.";
+            successModal.classList.remove('hidden');
+            
+        } else {
+            const data = await res.json();
+            alert(data.error || "Invalid OTP");
+        }
+    } catch (err) { 
+        console.error("Verification Error:", err);
+        alert("Server error during verification.");
+    } finally { 
+        confirmBtn.disabled = false; 
+        confirmBtn.innerText = "Confirm OTP";
+    }
+}
+
+function startResendTimer() {
+    const timerText = document.getElementById('timerText');
+    const resendBtn = document.getElementById('resendOtpBtn');
+    const timerSeconds = document.getElementById('timerSeconds');
+    
+    let timeLeft = RESEND_TIME;
+    
+    // UI Setup
+    timerText.classList.remove('hidden');
+    resendBtn.classList.add('hidden');
+    timerSeconds.innerText = timeLeft;
+
+    clearInterval(resendTimer);
+    resendTimer = setInterval(() => {
+        timeLeft--;
+        timerSeconds.innerText = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(resendTimer);
+            timerText.classList.add('hidden');
+            resendBtn.classList.remove('hidden');
+        }
+    }, 1000);
+}
+
+// Toggle Visibility for the Warning Modal
+function toggleWarningModal(show) {
+    const modal = document.getElementById('phoneWarningModal');
+    modal.classList.toggle('hidden', !show);
+}
+
+// Triggered when user clicks "(Change)"
+function enablePhoneEdit() {
+    toggleWarningModal(true);
+}
+
+// Triggered when user clicks "I Understand" in the modal
+function confirmPhoneChange() {
+    toggleWarningModal(false);
+    
+    const phoneInput = document.getElementById('profilePhone');
+    const verifyBtn = document.getElementById('verifyPhoneBtn');
+    const verifiedContainer = document.getElementById('verifiedContainer');
+
+    // Enable input for editing
+    phoneInput.readOnly = false;
+    phoneInput.classList.remove('opacity-70', 'cursor-not-allowed');
+    phoneInput.value = ""; 
+    phoneInput.focus();
+
+    // Show verify button and hide verified badge
+    verifyBtn.classList.remove('hidden');
+    verifiedContainer.classList.add('hidden');
+}
+
+// Wrapper to call the existing sendPhoneOTP logic
+async function resendPhoneOTP() {
+    await sendPhoneOTP();
+    // The timer will restart inside sendPhoneOTP if the request is successful
+}
 
         function handleLogout() {
             localStorage.removeItem("customerToken");

@@ -1,7 +1,7 @@
 // ==============================
 // CONFIG & STATE
 // ==============================
-const API_URL = "https://chickyen-backend.onrender.com/api";
+const API_URL = "http://localhost:5000/api";
 const token = localStorage.getItem("token");
 const user = JSON.parse(localStorage.getItem("user"));
 let editingProductId = null;
@@ -52,6 +52,7 @@ function switchTab(tab) {
     if (tab === "locations") renderLocationsView();
     if (tab === "users") renderUsersView();
     if (tab === "logs") renderLogsView();
+    if (tab === "reviews") renderReviewsView();
     if (tab === "sales") {
         fetch(`${API_URL}/orders/all`, { 
             headers: { Authorization: `Bearer ${token}` } 
@@ -557,6 +558,13 @@ async function renderProductsView() {
 
 async function handleProductSubmit(e) {
     e.preventDefault();
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+
+    // 1. Show Loading State on Button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<div class="flex items-center justify-center gap-2"><div class="loading-spinner"></div> Saving...</div>`;
+
     const productData = {
         name: document.getElementById("pName").value,
         price: Number(document.getElementById("pPrice").value),
@@ -582,40 +590,73 @@ async function handleProductSubmit(e) {
             document.getElementById("productForm").reset();
             toggleProductModal();
             renderProductsView();
+
+            // 2. Show Success Modal
+            showStatusModal("🍗", "Success!", "Product has been saved to the menu.", "bg-green-100 text-green-600", "bg-green-600");
         } else {
             const err = await res.json();
-            alert(err.error);
+            showStatusModal("❌", "Error", err.error, "bg-red-100 text-red-600", "bg-red-600");
         }
-    } catch (err) { console.error(err); }
-}
-
-async function openEditProduct(id) {
-    const res = await fetch(`${API_URL}/products`, { headers: { Authorization: `Bearer ${token}` } });
-    const products = await res.json();
-    const p = products.find(x => x._id === id);
-
-    if (p) {
-        editingProductId = id;
-        document.getElementById("pName").value = p.name;
-        document.getElementById("pPrice").value = p.price;
-        document.getElementById("pWeight").value = p.weight;
-        document.getElementById("pSpice").value = p.spiceLevel;
-        document.getElementById("pDesc").value = p.description;
-        document.getElementById("pImage").value = p.image;
-        document.getElementById("pStock").value = p.stock;
-
-        document.querySelector("#productModal h2").innerHTML = `Edit <span class="text-orange-600">Product</span>`;
-        toggleProductModal();
+    } catch (err) { 
+        console.error(err);
+        showStatusModal("⚠️", "Server Error", "Could not reach the database.", "bg-red-100 text-red-600", "bg-red-600");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
     }
 }
 
 async function deleteProduct(id) {
-    if (!confirm("Delete this product permanently?")) return;
-    const res = await fetch(`${API_URL}/products/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` }
-    });
-    if (res.ok) renderProductsView();
+    // Reuse your existing actionConfirmModal for the confirmation step
+    const modal = document.getElementById("actionConfirmModal");
+    const title = document.getElementById("actionTitle");
+    const msg = document.getElementById("actionMessage");
+    const icon = document.getElementById("actionIcon");
+    const btn = document.getElementById("confirmBtn");
+
+    icon.innerText = "🗑️";
+    icon.className = "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl bg-red-100 text-red-600";
+    title.innerHTML = `Delete <span class="text-red-600">Product</span>`;
+    msg.innerText = "Are you sure you want to permanently remove this item from the menu?";
+    btn.innerText = "Delete Permanently";
+    btn.className = "flex-1 bg-red-600 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-red-700 transition uppercase tracking-widest text-[10px]";
+
+    modal.classList.remove("hidden");
+
+    btn.onclick = async () => {
+        btn.disabled = true;
+        btn.innerHTML = "Deleting...";
+        try {
+            const res = await fetch(`${API_URL}/products/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+                closeActionModal();
+                renderProductsView();
+                showStatusModal("✅", "Deleted", "Product removed successfully.", "bg-gray-100 text-gray-800", "bg-black");
+            }
+        } catch (err) { console.error(err); }
+    };
+}
+
+// Helper to show a quick status message using your existing modal structure
+function showStatusModal(iconChar, titleText, messageText, iconClass, btnClass) {
+    const modal = document.getElementById("actionConfirmModal");
+    const icon = document.getElementById("actionIcon");
+    const title = document.getElementById("actionTitle");
+    const msg = document.getElementById("actionMessage");
+    const btn = document.getElementById("confirmBtn");
+
+    icon.innerText = iconChar;
+    icon.className = `w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl ${iconClass}`;
+    title.innerText = titleText;
+    msg.innerText = messageText;
+    btn.innerText = "Close";
+    btn.className = `w-full ${btnClass} text-white font-black py-4 rounded-2xl`;
+    
+    btn.onclick = closeActionModal;
+    modal.classList.remove("hidden");
 }
 
 // ==============================
@@ -630,9 +671,11 @@ function toggleProductModal() {
     }
 }
 
-// Stock Management
 
-// Add this function to your admin-script.js
+// ********************
+// Stock Management 
+// ********************
+
 async function checkLowStock() {
     try {
         const res = await fetch(`${API_URL}/products`, {
@@ -839,13 +882,7 @@ function renderSalesView() {
     `;
 }
 
-// *********************
-// Pickup Locations
-// *********************
 
-// ==============================
-// PICKUP LOCATIONS LOGIC
-// ==============================
 // ==============================
 // PICKUP LOCATIONS LOGIC
 // ==============================
@@ -891,21 +928,58 @@ async function renderLocationsView() {
     }
 }
 
-// Function to delete a location
+
+// Function to delete a location with custom modal confirmation
 async function deleteLocation(id) {
-    if (!confirm("Remove this pickup point?")) return;
-    try {
-        const res = await fetch(`${API_URL}/locations/pickup-points/${id}`, {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.ok) renderLocationsView();
-    } catch (err) { console.error(err); }
+    const modal = document.getElementById("actionConfirmModal");
+    const btn = document.getElementById("confirmBtn");
+
+    // 1. Show Confirmation Modal
+    showStatusModal(
+        "📍", 
+        "Remove Pickup Point?", 
+        "This location will no longer be available for customer selection.", 
+        "bg-red-50 text-red-600", 
+        "bg-red-600"
+    );
+    btn.innerText = "Delete Permanently";
+
+    // 2. Set the click action for the specific ID
+    btn.onclick = async () => {
+        btn.disabled = true;
+        btn.innerHTML = `<div class="flex items-center justify-center gap-2"><div class="loading-spinner"></div> Deleting...</div>`;
+        
+        try {
+            const res = await fetch(`${API_URL}/locations/pickup-points/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            if (res.ok) {
+                closeActionModal();
+                renderLocationsView();
+                // 3. Show Success Notification
+                showStatusModal("✅", "Deleted!", "The pickup point was removed successfully.", "bg-gray-100 text-gray-800", "bg-black");
+            } else {
+                showStatusModal("❌", "Error", "Could not delete location.", "bg-red-100 text-red-600", "bg-red-600");
+            }
+        } catch (err) { 
+            console.error(err);
+            showStatusModal("⚠️", "Server Error", "Check your connection.", "bg-red-100 text-red-600", "bg-red-600");
+        }
+    };
 }
 
-// Function to add a new location
+// Function to add a new location with loading and success states
 async function handleLocationSubmit(e) {
     e.preventDefault();
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+
+    // 1. Start Loading State
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<div class="flex items-center justify-center gap-2"><div class="loading-spinner"></div> Saving Point...</div>`;
+
     const data = {
         name: document.getElementById("locName").value,
         address: document.getElementById("locAddress").value,
@@ -923,10 +997,21 @@ async function handleLocationSubmit(e) {
         });
 
         if (res.ok) {
-            toggleLocationModal();
-            renderLocationsView();
+            toggleLocationModal(); // Close the input form
+            renderLocationsView(); // Refresh list
+            // 2. Show Success Modal
+            showStatusModal("📍", "Location Added!", "New pickup point is now active.", "bg-green-100 text-green-600", "bg-green-600");
+        } else {
+            const err = await res.json();
+            showStatusModal("❌", "Save Failed", err.error, "bg-red-100 text-red-600", "bg-red-600");
         }
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+        console.error(err);
+        showStatusModal("⚠️", "Error", "Database connection lost.", "bg-red-100 text-red-600", "bg-red-600");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+    }
 }
 
 function toggleLocationModal() {
@@ -943,9 +1028,7 @@ function toggleLocationModal() {
 }
 
 
-// ***********************
-// Admin Logic
-// ***********************
+
 // ==============================
 // STAFF MANAGEMENT LOGIC
 // ==============================
@@ -1002,59 +1085,109 @@ function toggleStaffModal() {
         document.getElementById("staffModal").classList.toggle("hidden");
     }
 
-    async function handleStaffSubmit(e) {
-        e.preventDefault();
-        const data = {
-            name: document.getElementById("staffName").value,
-            email: document.getElementById("staffEmail").value,
-            password: document.getElementById("staffPass").value,
-            role: document.getElementById("staffRole").value
-        };
+// ==============================
+// STAFF FORM SUBMISSION
+// ==============================
+async function handleStaffSubmit(e) {
+    e.preventDefault();
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
 
-        try {
-            const res = await fetch(`${API_URL}/auth/register-staff`, {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json", 
-                    Authorization: `Bearer ${token}` 
-                },
-                body: JSON.stringify(data)
-            });
+    // 1. Start Loading State on the Button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<div class="flex items-center justify-center gap-2"><div class="loading-spinner"></div> Saving Account...</div>`;
 
-            if (res.ok) {
-                toggleStaffModal();
-                renderUsersView();
-            } else {
-                const err = await res.json();
-                alert(err.error);
-            }
-        } catch (err) { console.error(err); }
+    const data = {
+        name: document.getElementById("staffName").value,
+        email: document.getElementById("staffEmail").value,
+        role: document.getElementById("staffRole").value
+    };
+
+    // Only include password if we are creating a new staff member
+    if (!editingStaffId) {
+        data.password = document.getElementById("staffPass").value;
+    }
+
+    const url = editingStaffId ? `${API_URL}/auth/update-staff/${editingStaffId}` : `${API_URL}/auth/register-staff`;
+    const method = editingStaffId ? "PUT" : "POST";
+
+    try {
+        const res = await fetch(url, {
+            method,
+            headers: { 
+                "Content-Type": "application/json", 
+                Authorization: `Bearer ${token}` 
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            toggleStaffModal();
+            renderUsersView();
+            
+            // 2. Show Success Modal instead of alert
+            const successMsg = editingStaffId ? "Staff details updated successfully." : "New staff member registered.";
+            showStatusModal("👤", "Success!", successMsg, "bg-green-100 text-green-600", "bg-green-600");
+            
+            editingStaffId = null; // Clear editing state
+        } else {
+            const err = await res.json();
+            // 3. Show Error Modal
+            showStatusModal("❌", "Failed", err.error || "Could not save staff.", "bg-red-100 text-red-600", "bg-red-600");
+        }
+    } catch (err) { 
+        console.error(err);
+        showStatusModal("⚠️", "Server Error", "Check your connection and try again.", "bg-red-100 text-red-600", "bg-red-600");
+    } finally {
+        // Restore button state
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+    }
 }
 
-
+// ==============================
+// MODAL OPENING LOGIC
+// ==============================
 function openAddStaffModal() {
     editingStaffId = null;
-    document.getElementById("staffPassContainer").classList.remove("hidden"); // Show password for new staff
+    // Show password field for new registrations
+    document.getElementById("staffPassContainer").classList.remove("hidden");
     document.getElementById("staffPass").required = true;
+    
+    // Reset form fields
     document.getElementById("staffName").value = "";
     document.getElementById("staffEmail").value = "";
+    document.getElementById("staffRole").value = "admin";
+    
     document.querySelector("#staffModal h2").innerHTML = `Register <span class="text-orange-600">Staff</span>`;
     toggleStaffModal();
 }
 
 function openEditStaff(id, name, email, role) {
     editingStaffId = id;
+    
+    // Pre-fill fields
     document.getElementById("staffName").value = name;
     document.getElementById("staffEmail").value = email;
     document.getElementById("staffRole").value = role;
-    document.getElementById("staffPassContainer").classList.add("hidden"); // Hide password when editing
+    
+    // Hide password field when editing existing accounts
+    document.getElementById("staffPassContainer").classList.add("hidden");
     document.getElementById("staffPass").required = false;
+    
     document.querySelector("#staffModal h2").innerHTML = `Edit <span class="text-orange-600">Staff</span>`;
     toggleStaffModal();
 }
 
 async function handleStaffSubmit(e) {
     e.preventDefault();
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+
+    // 1. Show Loading State
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<div class="flex items-center justify-center gap-2"><div class="loading-spinner"></div> Saving Staff...</div>`;
+
     const data = {
         name: document.getElementById("staffName").value,
         email: document.getElementById("staffEmail").value,
@@ -1079,99 +1212,211 @@ async function handleStaffSubmit(e) {
         if (res.ok) {
             toggleStaffModal();
             renderUsersView();
+            
+            // 2. Success Feedback
+            const successMsg = editingStaffId ? "Staff details updated." : "New staff member registered.";
+            showStatusModal("👤", "Success!", successMsg, "bg-green-100 text-green-600", "bg-green-600");
+            editingStaffId = null; // Reset state
         } else {
             const err = await res.json();
-            alert(err.error);
+            // 3. Error Feedback
+            showStatusModal("❌", "Failed", err.error || "Could not save staff.", "bg-red-100 text-red-600", "bg-red-600");
         }
-    } catch (err) { console.error(err); }
-}
-
-async function deleteStaff(id) {
-    if (!confirm("Are you sure you want to remove this staff member?")) return;
-    try {
-        const res = await fetch(`${API_URL}/auth/delete-staff/${id}`, {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.ok) renderUsersView();
-        else {
-            const err = await res.json();
-            alert(err.error);
-        }
-    } catch (err) { console.error(err); }
-}
-
-async function renderLogsView() {
-    try {
-        const res = await fetch(`${API_URL}/logs/all`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        const logs = await res.json();
-        const isOwner = user.role === 'owner'; //
-
-        document.getElementById("view-title").innerText = "Activity History";
-        document.getElementById("view-desc").innerText = "Audit trail of all administrative actions.";
-        
-        const container = document.getElementById("admin-table-body");
-        container.className = "space-y-4 p-4 w-full max-w-4xl mx-auto";
-
-        // Header for logs with "Clear" button for Owner
-        const header = `
-            <div class="flex justify-between items-center mb-6">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Recent Events</p>
-                ${isOwner ? `
-                    <button onclick="clearAllLogs()" class="text-[10px] font-black text-red-500 uppercase hover:underline">
-                        Clear History
-                    </button>
-                ` : ''}
-            </div>
-        `;
-
-        container.innerHTML = header + logs.map(log => {
-            // Determine icon based on action type
-            let icon = '⚙️';
-            if (log.actionType.includes("LOGIN")) icon = '🔐';
-            if (log.actionType.includes("ORDER")) icon = '📦';
-            if (log.actionType.includes("STAFF")) icon = '👥';
-            if (log.actionType.includes("PRODUCT")) icon = '🍗';
-
-            return `
-                <div class="bg-white p-5 rounded-3xl border border-orange-50 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex items-center gap-5">
-                        <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-xl">
-                            ${icon}
-                        </div>
-                        <div>
-                            <p class="text-xs font-black text-gray-800 uppercase tracking-tight">${log.description}</p>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[9px] font-bold text-orange-600 uppercase">${log.adminName}</span>
-                                <span class="text-[9px] text-gray-300">•</span>
-                                <span class="text-[9px] text-gray-400 font-medium">${new Date(log.timestamp).toLocaleString()}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <span class="text-[8px] font-black bg-gray-100 px-3 py-1.5 rounded-lg uppercase text-gray-400 tracking-widest">
-                        ${log.actionType}
-                    </span>
-                </div>
-            `;
-        }).join('');
-    } catch (err) {
-        console.error("Logs failed to render:", err);
+    } catch (err) { 
+        console.error(err);
+        showStatusModal("⚠️", "Server Error", "Please try again later.", "bg-red-100 text-red-600", "bg-red-600");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
     }
 }
 
-// Clear logs function (Owner Only)
-async function clearAllLogs() {
-    if (!confirm("Are you sure you want to permanently delete all activity logs?")) return;
+async function deleteStaff(id) {
+    const modal = document.getElementById("actionConfirmModal");
+    const btn = document.getElementById("confirmBtn");
+
+    // 1. Show Branded Confirmation Modal
+    showStatusModal(
+        "👥", 
+        "Remove Staff Member?", 
+        "This will permanently revoke their access to the Admin Panel.", 
+        "bg-red-50 text-red-600", 
+        "bg-red-600"
+    );
+    btn.innerText = "Revoke Access";
+
+    // 2. Override the onclick for the Confirm button
+    btn.onclick = async () => {
+        // Show loading state within the modal button
+        btn.disabled = true;
+        btn.innerHTML = `<div class="flex items-center justify-center gap-2"><div class="loading-spinner"></div> Processing...</div>`;
+        
+        try {
+            const res = await fetch(`${API_URL}/auth/delete-staff/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            if (res.ok) {
+                closeActionModal();
+                renderUsersView(); // Refresh the staff list
+                // 3. Success Feedback
+                showStatusModal("✅", "Access Revoked", "The staff account has been deleted.", "bg-gray-100 text-gray-800", "bg-black");
+            } else {
+                const err = await res.json();
+                showStatusModal("❌", "Failed", err.error || "Could not delete staff.", "bg-red-100 text-red-600", "bg-red-600");
+            }
+        } catch (err) { 
+            console.error(err);
+            showStatusModal("⚠️", "Server Error", "Check your connection and try again.", "bg-red-100 text-red-600", "bg-red-600");
+        }
+    };
+}
+
+
+  /**************************/
+ //    Product Reviews     /
+/************************/
+async function renderReviewsView() {
     try {
-        const res = await fetch(`${API_URL}/logs/clear`, {
-            method: "DELETE",
+        const res = await fetch(`${API_URL}/reviews/all-pending`, {
             headers: { Authorization: `Bearer ${token}` }
         });
-        if (res.ok) renderLogsView();
-    } catch (err) { console.error(err); }
+        const reviews = await res.json();
+
+        document.getElementById("view-title").innerText = "Review Moderation";
+        document.getElementById("view-desc").innerText = `Checking ${reviews.length} new testimonials.`;
+        
+        const container = document.getElementById("admin-table-body");
+        container.className = "flex flex-col space-y-4 p-4 w-full"; 
+
+        if (reviews.length === 0) {
+            container.innerHTML = `<div class="text-center py-20 bg-white rounded-[3rem] border border-dashed border-orange-200">
+                <p class="text-gray-400 font-bold">No pending reviews. Your wall of love is up to date!</p>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = reviews.map(r => {
+            // Formatting dates for better readability
+            const postedDate = new Date(r.createdAt).toLocaleDateString('en-IN', { dateStyle: 'medium' });
+            
+            return `
+            <div class="bg-white p-6 rounded-[2.5rem] border border-orange-50 shadow-sm flex flex-col md:flex-row gap-6 items-start">
+                <div class="w-32 h-32 rounded-3xl bg-orange-50 flex-shrink-0 flex items-center justify-center overflow-hidden border border-orange-100">
+                    ${r.imageUrl ? `<img src="${r.imageUrl}" class="w-full h-full object-cover">` : `<span class="text-3xl">📸</span>`}
+                </div>
+                
+                <div class="flex-1 space-y-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-[9px] font-black bg-orange-600 text-white px-2 py-1 rounded-md uppercase tracking-widest">${r.rating} ⭐</span>
+                        <span class="text-[9px] font-black bg-red-50 text-red-600 px-2 py-1 rounded-md uppercase tracking-widest">${"🌶️".repeat(r.spiceLevel)} Heat</span>
+                        <span class="text-[9px] font-black bg-gray-900 text-white px-2 py-1 rounded-md uppercase tracking-widest italic">Posted: ${postedDate}</span>
+                    </div>
+
+                    <div>
+                        <h4 class="font-black text-gray-800 uppercase text-sm flex items-center gap-2">
+                            ${r.customerName} 
+                            <span class="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full border border-green-100">Verified Buyer</span>
+                        </h4>
+                        <p class="text-[10px] text-gray-400 font-black uppercase mt-1">
+                            🛍️ Item: <span class="text-gray-600">${r.itemName || 'Chicken Pickle (Standard)'}</span>
+                        </p>
+                    </div>
+
+                    <p class="text-xs text-gray-500 italic leading-relaxed border-l-4 border-orange-100 pl-4 py-1">
+                        "${r.comment}"
+                    </p>
+                </div>
+
+                <div class="flex md:flex-col gap-2 w-full md:w-auto">
+                    <button onclick="approveReview('${r._id}')" class="flex-1 bg-green-600 text-white text-[10px] font-black px-6 py-4 rounded-2xl hover:bg-black transition-all uppercase shadow-lg shadow-green-100">Approve</button>
+                    <button onclick="deleteReview('${r._id}')" class="flex-1 bg-gray-100 text-gray-400 text-[10px] font-black px-6 py-4 rounded-2xl hover:bg-red-500 hover:text-white transition-all uppercase">Reject</button>
+                </div>
+            </div>
+        `;
+        }).join('');
+    } catch (err) { 
+        console.error("Failed to load reviews", err); 
+    }
 }
+
+// ==============================
+// REVIEW APPROVAL (MODAL UPDATED)
+// ==============================
+async function approveReview(id) {
+    try {
+        const res = await fetch(`${API_URL}/reviews/approve/${id}`, {
+            method: 'PUT',
+            headers: { 
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (res.ok) {
+            // Refresh the list immediately in the background
+            renderReviewsView();
+
+            // Show high-end success feedback
+            showStatusModal(
+                "⭐", 
+                "Review Approved!", 
+                "This testimonial is now visible to all customers on the website.", 
+                "bg-orange-50 text-orange-600", 
+                "bg-orange-600"
+            );
+        } else {
+            const err = await res.json();
+            showStatusModal("❌", "Failed", err.error || "Could not approve review.", "bg-red-100 text-red-600", "bg-red-600");
+        }
+    } catch (err) {
+        console.error("Approval Error:", err);
+        showStatusModal("⚠️", "Server Error", "Check your connection and try again.", "bg-red-100 text-red-600", "bg-red-600");
+    }
+}
+
+async function deleteReview(id) {
+    const modal = document.getElementById("actionConfirmModal");
+    const btn = document.getElementById("confirmBtn");
+
+    // 1. Show Branded Confirmation Modal
+    showStatusModal(
+        "🗑️", 
+        "Delete Review?", 
+        "Are you sure you want to permanently remove this testimonial? This action cannot be undone.", 
+        "bg-red-50 text-red-600", 
+        "bg-red-600"
+    );
+    btn.innerText = "Delete Permanently";
+
+    // 2. Set the click action for the specific ID
+    btn.onclick = async () => {
+        btn.disabled = true;
+        btn.innerHTML = `<div class="flex items-center justify-center gap-2"><div class="loading-spinner"></div> Deleting...</div>`;
+        
+        try {
+            const res = await fetch(`${API_URL}/reviews/${id}`, {
+                method: 'DELETE',
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            if (res.ok) {
+                closeActionModal();
+                renderReviewsView();
+                // 3. Show Success Notification
+                showStatusModal("✅", "Deleted", "The review has been removed.", "bg-gray-100 text-gray-800", "bg-black");
+            } else {
+                const err = await res.json();
+                showStatusModal("❌", "Error", err.error || "Could not delete review.", "bg-red-100 text-red-600", "bg-red-600");
+            }
+        } catch (err) { 
+            console.error(err);
+            showStatusModal("⚠️", "Server Error", "Check your connection.", "bg-red-100 text-red-600", "bg-red-600");
+        }
+    };
+}
+
 
 function logout() {
     localStorage.clear();

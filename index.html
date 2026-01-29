@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken Pickle | Yen Achar</title>
+    <title>Chicken Pickle | ChickYen Achar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="assets/favicon.png">
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
@@ -49,10 +53,11 @@
 
 <nav class="nav-custom sticky top-0 z-50">
     <div class="flex justify-between items-center px-6 md:px-10 py-5 max-w-7xl mx-auto w-full">
-        <div class="text-lg sm:text-2xl font-extrabold text-orange-600 flex items-center tracking-tight">
-            Chicken Pickle 
-            <span class="mx-2 sm:mx-3 h-4 sm:h-6 w-[1px] bg-orange-200 inline-block"></span> 
-            <span class="text-gray-800 font-bold">Yen Achar</span>
+        <div class="text-lg sm:text-2xl font-extrabold text-orange-600 flex items-center tracking-tight gap-2">
+            <!-- Chick -->
+                <img src="assets/favicon.png" alt="Logo" class="h-6 sm:h-14 w-auto inline-block"/>
+                    <span class="mx-2 sm:mx-3 h-4 sm:h-6 w-[1px] bg-orange-200 inline-block"></span> 
+            <span class="text-gray-800 font-bold">ChickYen Achar</span>
         </div>
 
         <div class="hidden md:flex space-x-8 lg:space-x-10 font-bold text-gray-700 items-center">
@@ -124,7 +129,7 @@
             </h1>
             
             <p class="text-base sm:text-lg text-gray-500 max-w-md mx-auto md:mx-0">
-                Experience the perfect blend of taste and convenience with Chicken Pickle | Yen Achar. Freshly made, delivered fast.
+                Experience the perfect blend of taste and convenience with Chicken Pickle | ChickYen Achar. Freshly made, delivered fast.
             </p>
 
             <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-4 pt-4">
@@ -156,29 +161,43 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
             <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
                 <div class="text-xl font-extrabold text-orange-600 flex items-center tracking-tight mb-6">
-                    Chicken Pickle <span class="mx-2 h-4 w-[1px] bg-orange-200"></span> <span class="text-gray-800">Yen Achar</span>
+                    Chicken Pickle <span class="mx-2 h-4 w-[1px] bg-orange-200"></span><span class="text-gray-800">ChickYen Achar</span>
                 </div>
                 <p class="text-gray-500 text-sm leading-relaxed max-w-xs">Authentic Manipuri taste delivered to your doorstep. Handmade with love.</p>
+                
                 <div class="flex space-x-4 mt-6">
-                    <a href="#" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center hover:bg-orange-600 hover:text-white transition-all shadow-sm">FB</a>
-                    <a href="#" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center hover:bg-orange-600 hover:text-white transition-all shadow-sm">IG</a>
+                    <a href="#" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-[#1877F2] hover:text-white transition-all shadow-sm group">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+
+                    <a href="#" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7] hover:text-white transition-all shadow-sm">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <a href="https://wa.me/919876543210" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-[#25D366] hover:text-white transition-all shadow-sm">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                    </a>
+
+                    <a href="mailto:hello@yenachar.com" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-[#EA4335] hover:text-white transition-all shadow-sm">
+                        <i class="fa-solid fa-envelope"></i>
+                    </a>
                 </div>
             </div>
 
             <div class="text-center sm:text-left">
                 <h4 class="font-bold text-gray-800 mb-6">Explore</h4>
                 <ul class="space-y-3 text-gray-500 text-sm">
-                    <li><a href="#" class="hover:text-orange-600">Our Story</a></li>
+                    <li><a href="aboutus.html" class="hover:text-orange-600">Our Story</a></li>
                     <li><a href="menu.html" class="hover:text-orange-600">View Menu</a></li>
-                    <li><a href="#" class="hover:text-orange-600">Shipping Policy</a></li>
+                    <li><a href="shipping-policy.html" class="hover:text-orange-600">Shipping Policy</a></li>
                 </ul>
             </div>
 
             <div class="text-center sm:text-left">
                 <h4 class="font-bold text-gray-800 mb-6">Contact</h4>
                 <ul class="space-y-3 text-gray-500 text-sm">
-                    <li>📍 Imphal West, Manipur</li>
-                    <li>📞 +91 98765 43210</li>
+                    <li>📍Near Parul University</li>
+                    <li>📞 +91 80020 12665</li>
                     <li>✉️ hello@yenachar.com</li>
                 </ul>
             </div>
@@ -193,10 +212,10 @@
         </div>
 
         <div class="mt-12 pt-8 border-t border-orange-100 flex flex-col md:flex-row justify-between items-center text-gray-400 text-[10px] sm:text-xs uppercase tracking-widest text-center gap-4">
-            <p>© 2025 Yen Achar. All Rights Reserved.</p>
+            <p>© 2025 ChickYen Achar. All Rights Reserved.</p>
             <div class="flex space-x-6">
-                <a href="#" class="hover:text-orange-600">Privacy</a>
-                <a href="#" class="hover:text-orange-600">Terms</a>
+                <a href="privacy-policy.html" class="hover:text-orange-600">Privacy</a>
+                <a href="privacy-policy.html" class="hover:text-orange-600">Terms</a>
             </div>
         </div>
     </div>

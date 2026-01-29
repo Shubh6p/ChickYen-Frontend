@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get In Touch | Yen Achar</title>
+    <title>Get In Touch | ChickYen Achar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="assets/favicon.png">
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
         
@@ -67,7 +71,7 @@
         <div class="text-xl sm:text-2xl font-extrabold text-orange-600 flex items-center tracking-tight">
             Chicken Pickle 
             <span class="mx-3 h-6 w-[1px] bg-orange-200 inline-block"></span> 
-            <span class="text-gray-800 font-bold">Yen Achar</span>
+            <span class="text-gray-800 font-bold">ChickYen Achar</span>
         </div>
 
         <div class="hidden md:flex space-x-10 font-bold text-gray-700 items-center">
@@ -132,7 +136,7 @@
                             <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-2xl group-hover:bg-orange-600 transition-colors">📞</div>
                             <div>
                                 <p class="text-[10px] uppercase font-black text-orange-500 tracking-widest mb-1">Direct Line</p>
-                                <p class="font-bold text-lg">+91 98765 43210</p>
+                                <p class="font-bold text-lg">+91 80020 12665</p>
                             </div>
                         </div>
                     </div>
@@ -203,32 +207,67 @@
     <span>Message sent! We'll reply shortly.</span>
 </div>
 
-<footer class="footer-glass py-20 mt-12">
-    <div class="max-w-7xl mx-auto px-10">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-16">
-            <div class="md:col-span-2">
-                <div class="text-2xl font-black text-orange-600 mb-6">Yen Achar</div>
-                <p class="text-gray-500 max-w-sm leading-relaxed font-medium">Bringing the spicy legacy of Manipur's finest King Chilli pickles to your kitchen table. Hand-crafted, heart-filled.</p>
-            </div>
-            <div>
-                <h4 class="font-black text-gray-800 uppercase text-xs tracking-[0.2em] mb-8">Navigation</h4>
-                <ul class="space-y-4 text-gray-500 font-bold text-sm">
-                    <li><a href="index.html" class="hover:text-orange-600 transition">Home</a></li>
-                    <li><a href="menu.html" class="hover:text-orange-600 transition">Menu</a></li>
-                    <li><a href="aboutus.html" class="hover:text-orange-600 transition">Our Story</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-black text-gray-800 uppercase text-xs tracking-[0.2em] mb-8">Connect</h4>
-                <p class="text-gray-500 font-bold text-sm mb-4 italic">hello@yenachar.com</p>
-                <div class="flex space-x-4">
-                    <a href="#" class="text-gray-400 hover:text-orange-600 transition">Instagram</a>
-                    <a href="#" class="text-gray-400 hover:text-orange-600 transition">WhatsApp</a>
+<footer class="footer-glass">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-12 md:py-16">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
+            <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
+                <div class="text-xl font-extrabold text-orange-600 flex items-center tracking-tight mb-6">
+                    Chicken Pickle <span class="mx-2 h-4 w-[1px] bg-orange-200"></span> <span class="text-gray-800">ChickYen Achar</span>
+                </div>
+                <p class="text-gray-500 text-sm leading-relaxed max-w-xs">Authentic Manipuri taste delivered to your doorstep. Handmade with love.</p>
+                
+                <div class="flex space-x-4 mt-6">
+                    <a href="#" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-[#1877F2] hover:text-white transition-all shadow-sm group">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+
+                    <a href="#" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7] hover:text-white transition-all shadow-sm">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <a href="https://wa.me/919876543210" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-[#25D366] hover:text-white transition-all shadow-sm">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                    </a>
+
+                    <a href="mailto:hello@yenachar.com" class="w-10 h-10 bg-white border border-orange-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-[#EA4335] hover:text-white transition-all shadow-sm">
+                        <i class="fa-solid fa-envelope"></i>
+                    </a>
                 </div>
             </div>
+
+            <div class="text-center sm:text-left">
+                <h4 class="font-bold text-gray-800 mb-6">Explore</h4>
+                <ul class="space-y-3 text-gray-500 text-sm">
+                    <li><a href="aboutus.html" class="hover:text-orange-600">Our Story</a></li>
+                    <li><a href="menu.html" class="hover:text-orange-600">View Menu</a></li>
+                    <li><a href="shipping-policy.html" class="hover:text-orange-600">Shipping Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="text-center sm:text-left">
+                <h4 class="font-bold text-gray-800 mb-6">Contact</h4>
+                <ul class="space-y-3 text-gray-500 text-sm">
+                    <li>📍Near Parul University</li>
+                    <li>📞 +91 80020 12665</li>
+                    <li>✉️ hello@yenachar.com</li>
+                </ul>
+            </div>
+
+            <div class="text-center sm:text-left">
+                <h4 class="font-bold text-gray-800 mb-6">Stay Spicy</h4>
+                <form class="flex flex-col space-y-2">
+                    <input type="email" placeholder="Email" class="bg-white border border-orange-100 px-4 py-3 rounded-xl text-sm focus:ring-2 focus:ring-orange-600 outline-none">
+                    <button class="bg-gray-900 text-white py-3 rounded-xl font-bold hover:bg-orange-600 transition">Subscribe</button>
+                </form>
+            </div>
         </div>
-        <div class="mt-20 pt-10 border-t border-orange-100 text-center">
-            <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">© 2025 Yen Achar. All Spicy Rights Reserved.</p>
+
+        <div class="mt-12 pt-8 border-t border-orange-100 flex flex-col md:flex-row justify-between items-center text-gray-400 text-[10px] sm:text-xs uppercase tracking-widest text-center gap-4">
+            <p>© 2025 ChickYen Achar. All Rights Reserved.</p>
+            <div class="flex space-x-6">
+                <a href="privacy-policy.html" class="hover:text-orange-600">Privacy</a>
+                <a href="privacy-policy.html" class="hover:text-orange-600">Terms</a>
+            </div>
         </div>
     </div>
 </footer>

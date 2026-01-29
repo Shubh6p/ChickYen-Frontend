@@ -1,4 +1,4 @@
-const API_BASE = "https://chickyen-backend.onrender.com/api";
+const API_BASE = "http://localhost:5000/api";
 
 async function loadProducts() {
   const container = document.getElementById("productsContainer");
@@ -23,22 +23,38 @@ async function loadProducts() {
       card.className = `bg-white p-4 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all border border-gray-100 group ${isOutOfStock ? 'opacity-75' : ''}`;
 
       card.innerHTML = `
-        <div class="relative overflow-hidden rounded-[2rem] aspect-square bg-gray-100 mb-4">
+        <div class="relative overflow-hidden rounded-[2rem] aspect-square bg-gray-100 mb-4 group">
           <img src="${product.image}" class="object-cover w-full h-full group-hover:scale-110 transition duration-500 ${isOutOfStock ? 'grayscale' : ''}">
+          
           ${
             product.weight
               ? `<div class="absolute bottom-4 right-4 bg-orange-600 text-white px-3 py-1 rounded-full text-[10px] font-black">${product.weight}</div>`
               : ""
           }
+
+          <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+             <a href="reviews.html" class="bg-white text-gray-900 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-orange-600 hover:text-white transition">
+                See Product Reviews
+             </a>
+          </div>
         </div>
 
         <div class="p-4">
-          <div class="flex justify-between items-start mb-2">
+          <div class="flex justify-between items-start mb-1">
             <h3 class="text-lg font-black ${isOutOfStock ? 'text-gray-400' : 'text-gray-800'}">${product.name}</h3>
             <span class="text-lg font-bold text-orange-600">₹${product.price}</span>
           </div>
 
-          <p class="text-sm text-gray-500 mb-4">
+          <div class="flex items-center gap-2 mb-3 cursor-pointer" onclick="window.location.href='reviews.html'">
+            <div class="flex text-orange-500 text-[10px]">
+              ⭐⭐⭐⭐⭐
+            </div>
+            <span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter hover:text-orange-600">
+              See Reviews
+            </span>
+          </div>
+
+          <p class="text-sm text-gray-500 mb-4 line-clamp-2">
             ${product.description}
           </p>
 
@@ -111,7 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// Checks if user is logined or not
 
 // Add this to your existing script.js or inside a <script> tag in index.html
 
