@@ -1,16 +1,59 @@
-# React + Vite
+# ChickYen Achar - Frontend Application 🍗🌶️
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This repository contains the React frontend for the **ChickYen Achar** e-commerce store. It includes both the customer-facing storefront and a fully-featured secure Administrative Dashboard.
 
-Currently, two official plugins are available:
+## 🚀 Tech Stack
+- **Framework:** React.js powered by Vite
+- **Styling:** Tailwind CSS
+- **Icons:** Lucide React & FontAwesome
+- **Routing:** React Router DOM
+- **State Management:** React Context API (Cart, Auth, Admin)
+- **HTTP Client:** Axios
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Key Features
+- **Dynamic Storefront:** Beautiful, responsive UI showcasing the best spicy chicken achar.
+- **Cart & Checkout:** Slide-out cart drawer, dynamic stock checking, and seamless checkout flows.
+- **OTP Authentication:** Modern, passwordless email/phone login flow.
+- **Admin Dashboard (`/admin`):**
+  - **Analytics:** Sales charts and dashboard widgets.
+  - **Orders:** Process, ship, and complete orders.
+  - **Products & Stock:** Manage inventory and add new products.
+  - **Activity Logs:** View real-time system events (new users, new orders).
+  - **Newsletter Broadcasts:** Send promotional emails directly from the admin panel.
 
-## React Compiler
+## 🛠️ Local Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Shubh6p/ChickYen-Frontend.git
+   cd ChickYen-Frontend
+   ```
 
-## Expanding the Oxlint configuration
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+3. **Environment Variables:**
+   Create a `.env` file in the root directory to configure your API connection:
+   ```env
+   # Connects the frontend to your local or deployed backend API
+   VITE_API_URL=http://localhost:5000/api
+   VITE_BACKEND_URL=http://localhost:5000
+   ```
+
+4. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+   The app will typically run at `http://localhost:5173`.
+
+## 📁 Folder Structure
+- `/src/components`: Reusable UI components (Navbar, Footer, ProductCards, Modals)
+- `/src/pages`: Main application routes (Home, Menu, Checkout, Login)
+- `/src/pages/admin`: Secure admin panel routes and layouts
+- `/src/context`: Global state providers for Auth and Cart
+- `/src/config.js`: Centralized configuration for API endpoints
+
+---
+*Crafted with care. Delivered with flavour.*
