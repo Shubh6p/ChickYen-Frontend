@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
@@ -94,6 +95,7 @@ function App() {
           </CartProvider>
         </AdminModalProvider>
       </AdminAuthProvider>
+      <Analytics />
     </AuthProvider>
   );
 }
